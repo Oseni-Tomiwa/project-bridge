@@ -42,7 +42,7 @@ A future collection should deliberately sample speakers and conditions rather th
 
 Each accepted recording will need a stable audio asset ID, byte checksum, codec/sample rate/channel metadata, duration, collection/source provenance, annotation protocol and reviewer state, speaker-isolated split, consent/allowed-use reference, license status, third-party processing permission, and retention/deletion policy. Direct identifiers must not enter version control.
 
-For a fair future Sahara/OpenAI transcription/Deepgram comparison, the runner should send byte-identical audio through the provider-neutral speech boundary wherever APIs permit. Provider-required transcoding must be recorded as part of the run. The same frozen sample IDs and ground truth should be used for each provider, while provider, model identifier/version, sanitized options, region, retry/failure state, latency, run ID, timestamps, and source revision are recorded independently. No provider integration or result is present today.
+For a fair future Sahara/OpenAI transcription/Deepgram comparison, the runner should send byte-identical audio through the provider-neutral speech boundary wherever APIs permit. Provider-required transcoding must be recorded as part of the run. The same frozen sample IDs and ground truth should be used for each provider, while provider, model identifier/version, sanitized options, region, retry/failure state, latency, run ID, timestamps, and source revision are recorded independently. An Intron/Sahara synchronous adapter now exists, but no evaluation audio, other provider adapter, benchmark runner execution, or result is present.
 
 ## Future metric mapping
 

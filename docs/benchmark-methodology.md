@@ -41,6 +41,8 @@ Report sample counts and audio duration overall and per slice. Identify repeated
 
 Every persisted result repeats its sanitized provider configuration snapshot. The foundation exposes a consistency check that compares the result snapshot with the matching configuration ID in the frozen run; a runner must reject the result if the run ID, model version, region, or options differ.
 
+The implemented Intron/Sahara synchronous adapter records the `yo` language route, endpoint, transport, timeout, known duration limit, request timestamps, monotonic latency, success/failure state, and provider `file_id` when returned. It performs no hidden retry and does not calculate WER. Because the documented response does not expose the deployed model/version, the current configuration records the model identifier as `unknown` and omits model version; this limitation must accompany any future result.
+
 ## Metrics
 
 ### Normalized word error rate

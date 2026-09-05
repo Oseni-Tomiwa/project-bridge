@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "smoke:intron": "pnpm build && node dist/cli/intron-sahara-smoke.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

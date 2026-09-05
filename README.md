@@ -4,7 +4,7 @@
 
 Project Bridge explores a voice-first AI access layer through which a person can speak naturally, be understood across code-switched speech, clarify missing information, confirm consequential actions, trigger a downstream task, and receive an accessible response.
 
-The first vertical slice is a simulated failed/pending-transfer support journey. It uses deterministic text rules, asks for missing information, presents a summary for explicit confirmation, and creates an in-memory support case. It does **not** connect to a bank or perform a banking action. Speech providers, an LLM, durable storage, authentication, and benchmark execution are not implemented.
+The first vertical slice is a simulated failed/pending-transfer support journey. It uses deterministic text rules, asks for missing information, presents a summary for explicit confirmation, and creates an in-memory support case. It does **not** connect to a bank or perform a banking action. An opt-in Intron/Sahara synchronous STT adapter is implemented, but it is not wired into the web/API journey and no benchmark has been run. An LLM, other speech providers, durable storage, authentication, and TTS are not implemented.
 
 ## Decision labels
 
@@ -22,7 +22,7 @@ apps/
   web/           Accessible text-based financial-support demo
   api/           Conversation and simulated support-case HTTP API
 packages/
-  speech/        Provider-neutral speech contracts
+  speech/        Provider-neutral speech contracts and Intron/Sahara adapter
   conversation/  Conversation and interpretation contracts
   actions/       Vertical-neutral downstream action contracts
   benchmark/     Evaluation schemas, runner contracts, and metrics
@@ -63,6 +63,7 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 - [Architecture](docs/architecture.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
+- [Intron/Sahara STT adapter](docs/providers/intron-sahara-stt.md)
 - [Responsible AI](docs/responsible-ai.md)
 - [Open decisions](docs/open-decisions.md)
 - [Financial-support vertical](docs/vertical-financial-support.md)
@@ -72,6 +73,14 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 Do not commit credentials, raw participant audio, direct identifiers, consent evidence, or generated evaluation results that may contain personal data. The audio, result, and private-metadata paths are ignored by default. Metadata intended for version control must be de-identified and reviewed first.
 
 The current evaluation layer contains 36 synthetic Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. It contains no audio, provider output, scores, or fabricated metrics; the Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
+
+The Intron/Sahara adapter has a separate, explicit smoke test. It is never run by normal checks:
+
+```bash
+pnpm --filter @project-bridge/speech smoke:intron -- /absolute/path/to/consented-sample.wav
+```
+
+The command requires `INTRON_API_KEY`; see the [provider guide](docs/providers/intron-sahara-stt.md) before uploading any audio.
 
 ## Current vertical
 

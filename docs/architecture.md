@@ -2,7 +2,7 @@
 
 ## Status
 
-This document describes the implemented text-based financial-support slice and the provider-neutral boundaries prepared for later work. It does not claim that external integrations are implemented.
+This document describes the implemented text-based financial-support slice, provider-neutral boundaries, and opt-in Intron/Sahara synchronous STT adapter. The adapter is not wired into the application flow and no benchmark has been run.
 
 ## Shape
 
@@ -31,6 +31,7 @@ evaluation runner --> identical sample --> provider adapters --> metrics/results
 - Keep applications deployable together initially; package boundaries are not microservice boundaries.
 - Depend on contracts rather than provider SDKs in core flows.
 - Identify a speech provider by configuration and inject its adapter.
+- Keep Intron HTTP, authentication, multipart, and response details inside the speech package's Sahara adapter.
 - Pass the same immutable evaluation sample to each selected provider.
 - Keep conversation interpretation separate from transcription and action execution. The interpreter accepts a channel-neutral `UserUtterance`, so text fallback and reference-transcript evaluation do not depend on a speech-provider result.
 - Let vertical implementations contribute action definitions and domain metadata through `DomainModule`. The initial financial-support implementation currently lives beside that contract in `packages/domain` to keep the challenge workspace small.
@@ -39,14 +40,14 @@ evaluation runner --> identical sample --> provider adapters --> metrics/results
 
 ## Package responsibilities
 
-| Package        | Owns                                                        | Must not own                                |
-| -------------- | ----------------------------------------------------------- | ------------------------------------------- |
-| `speech`       | audio input, provider contract, transcript segments/results | vendor-specific assumptions in shared types |
-| `conversation` | turns, state, intents, entities, clarification outcome      | executing downstream side effects           |
-| `actions`      | action definition/executor contracts, confirmation policy   | hard-coded healthcare workflows             |
-| `benchmark`    | sample/result schemas, runner contract, normalization/WER   | fabricated or manually altered scores       |
-| `domain`       | extension contract and initial financial-support workflow   | platform-wide provider selection            |
-| `shared`       | identifiers and small cross-cutting primitives              | domain business logic                       |
+| Package        | Owns                                                                  | Must not own                                             |
+| -------------- | --------------------------------------------------------------------- | -------------------------------------------------------- |
+| `speech`       | audio input, provider contract, transcript results, provider adapters | vendor-specific assumptions in conversation/domain types |
+| `conversation` | turns, state, intents, entities, clarification outcome                | executing downstream side effects                        |
+| `actions`      | action definition/executor contracts, confirmation policy             | hard-coded healthcare workflows                          |
+| `benchmark`    | sample/result schemas, runner contract, normalization/WER             | fabricated or manually altered scores                    |
+| `domain`       | extension contract and initial financial-support workflow             | platform-wide provider selection                         |
+| `shared`       | identifiers and small cross-cutting primitives                        | domain business logic                                    |
 
 ## Key interfaces
 
@@ -55,6 +56,7 @@ The source definitions in `packages/*/src` are the canonical executable contract
 - `SpeechProvider.transcribe(audio, context)`
 - `SpeechProviderConfiguration` with provider, model identifier/version, and sanitized options
 - `TranscriptionResult` with text, segments, provider configuration, and provider latency
+- `TranscriptionFailure` with safe failure code, provider configuration, timestamps, latency, and optional HTTP/retry/provider-reference metadata
 - `ConversationState`, channel-neutral `UserUtterance`, and `ConversationInterpreter.interpret(...)`
 - `ActionDefinition` consequence classification, `ActionRequest` confirmation evidence, and platform-level request validation that produces the only request type accepted by executors
 - `ActionExecutor.execute(...)` returning a typed outcome
@@ -84,7 +86,7 @@ Later voice input ends at the existing channel-neutral `UserUtterance` boundary.
 
 ## Open technical decisions
 
-Provider SDKs, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
+Additional providers, Sahara model/version selection, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
 
 ## TypeScript build strategy
 

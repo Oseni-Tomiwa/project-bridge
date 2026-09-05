@@ -13,7 +13,11 @@ Nothing in this list is selected unless moved to a dated decision record.
 ## Models and providers
 
 - Competitor speech models A and B
-- Sahara API integration details, subject to official documentation and access
+- Exact Sahara v2.5 deployed model identifier/version returned by the synchronous endpoint, if any
+- Whether challenge accounts require a challenge-specific model/configuration option
+- Whether the generic `yo` route automatically selects the Sahara v2.5 challenge model
+- Official Intron file-status contract for continuing a timed-out synchronous request
+- Intron streaming STT contract and any participant-specific code-switching parameter
 - Post-prototype interpretation approach (the current demo uses narrow deterministic rules)
 - Text-to-speech requirement and provider
 - Model fallback and confidence/calibration policy
