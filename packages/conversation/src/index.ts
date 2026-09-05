@@ -52,6 +52,7 @@ export type Interpretation =
       readonly kind: "clarification-required";
       readonly question: string;
       readonly missingEntities: readonly string[];
+      readonly entities: readonly EntityValue[];
       readonly intent?: IntentCandidate;
     }
   | {

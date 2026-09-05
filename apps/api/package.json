@@ -8,5 +8,8 @@
     "dev": "node --watch --experimental-strip-types src/server.ts",
     "start": "node dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@project-bridge/domain": "workspace:*"
   }
 }

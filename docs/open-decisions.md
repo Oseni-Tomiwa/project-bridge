@@ -5,7 +5,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 ## Product
 
 - Final product/brand name
-- First vertical, target user, and exact downstream task
+- Target user segment within financial-service support and accessibility research plan
 - Initial countries, language pairs, code-switch patterns, and accessibility needs
 - Voice-only versus voice-first channel experience
 - Success criteria for user value and task completion
@@ -14,7 +14,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 
 - Competitor speech models A and B
 - Sahara API integration details, subject to official documentation and access
-- LLM or deterministic interpretation approach
+- Post-prototype interpretation approach (the current demo uses narrow deterministic rules)
 - Text-to-speech requirement and provider
 - Model fallback and confidence/calibration policy
 
@@ -35,7 +35,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 
 - Deployment provider and region(s)
 - Authentication and authorization approach
-- Whether persistence is required; if so, database and retention design
+- Whether support-case persistence is required beyond the current process-local in-memory repository; if so, database and retention design
 - Observability, cost controls, queueing, and provider failover
 - API/channel protocol and streaming requirements
 
@@ -45,7 +45,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Applicable countries, laws, regulatory obligations, and review owners
 - Data retention/deletion periods and third-party training opt-outs
 - Human review, escalation, incident response, and user redress
-- Whether real or simulated downstream systems are appropriate for the demo
+- Whether a later pilot should go beyond the currently selected simulated downstream system
 
 ## Decision record template
 

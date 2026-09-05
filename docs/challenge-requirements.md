@@ -18,12 +18,12 @@
 | Area                        | Status                             |
 | --------------------------- | ---------------------------------- |
 | Provider-neutral repository | Foundation created                 |
-| Specific vertical           | Open decision                      |
+| Specific vertical           | Financial-service support selected |
 | Sahara integration          | Not implemented                    |
 | Competitor integrations     | Not selected or implemented        |
 | Speech dataset              | Not collected                      |
 | Benchmark execution         | Contracts only; no results         |
-| Downstream action           | Contracts only; no vertical action |
+| Downstream action           | Simulated support-case creation    |
 | Voice response              | Not implemented                    |
 | Responsible AI plan         | Initial documentation only         |
 

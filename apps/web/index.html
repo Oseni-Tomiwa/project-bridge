@@ -5,36 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Project Bridge development shell for a voice-first AI access layer."
+      content="Project Bridge simulated failed-transfer support prototype."
     />
-    <title>Project Bridge — Foundation</title>
+    <title>Project Bridge — Transfer support prototype</title>
   </head>
   <body>
-    <main>
-      <p class="eyebrow">Temporary codename · Foundation only</p>
-      <h1>Speak naturally.<br />Reach a digital service.</h1>
-      <p class="lede">
-        Project Bridge is exploring a voice-first AI access layer for people
-        underserved by text-heavy digital interfaces.
-      </p>
+    <a class="skip-link" href="#main-content">Skip to conversation</a>
+    <main id="main-content">
+      <header>
+        <p class="eyebrow">Temporary codename · Challenge prototype</p>
+        <h1>Transfer support, in your own words.</h1>
+        <p class="lede">
+          Type naturally in English, Nigerian Pidgin, or simple English/Yoruba
+          code-switching. Voice input is planned but is not available yet.
+        </p>
+      </header>
 
-      <section aria-labelledby="flow-heading">
-        <h2 id="flow-heading">Intended interaction</h2>
-        <ol>
-          <li>Speak</li>
-          <li>Understand</li>
-          <li>Clarify</li>
-          <li>Confirm</li>
-          <li>Act</li>
-          <li>Respond</li>
-        </ol>
-      </section>
-
-      <aside>
-        <strong>No live capability yet.</strong> Speech providers, a vertical,
-        downstream actions, and benchmark results have not been selected or
-        implemented.
+      <aside class="notice" aria-label="Important safety notice">
+        <strong>This is a simulation.</strong> It creates a support request
+        only. It cannot move money, access an account, or contact a real bank.
+        Never share a PIN, OTP, password, CVV, full card number, or full account
+        number.
       </aside>
+
+      <section class="conversation" aria-labelledby="conversation-heading">
+        <h2 id="conversation-heading">Conversation</h2>
+        <ol id="history" class="history" aria-live="polite"></ol>
+        <form id="utterance-form">
+          <label for="utterance">What happened with your transfer?</label>
+          <textarea
+            id="utterance"
+            name="utterance"
+            rows="4"
+            placeholder="Example: I sent 25k yesterday, owo ti kuro but the person never receive am."
+            aria-describedby="utterance-help"
+            required
+          ></textarea>
+          <p id="utterance-help" class="small">
+            Do not include account or authentication details.
+          </p>
+          <button id="send" type="submit">Send</button>
+        </form>
+        <div id="confirmation" class="confirmation" hidden>
+          <p id="proposal-summary"></p>
+          <button id="confirm" type="button">Yes, create support case</button>
+          <p class="small">Nothing is sent to a bank.</p>
+        </div>
+        <p id="status" class="status" role="status"></p>
+      </section>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

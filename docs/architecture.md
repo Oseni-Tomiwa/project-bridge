@@ -2,7 +2,7 @@
 
 ## Status
 
-This document describes **current architectural decisions** and conceptual interfaces. It does not claim that external integrations or a full workflow are implemented.
+This document describes the implemented text-based financial-support slice and the provider-neutral boundaries prepared for later work. It does not claim that external integrations are implemented.
 
 ## Shape
 
@@ -33,9 +33,9 @@ evaluation runner --> identical sample --> provider adapters --> metrics/results
 - Identify a speech provider by configuration and inject its adapter.
 - Pass the same immutable evaluation sample to each selected provider.
 - Keep conversation interpretation separate from transcription and action execution. The interpreter accepts a channel-neutral `UserUtterance`, so text fallback and reference-transcript evaluation do not depend on a speech-provider result.
-- Let vertical packages contribute action definitions and domain metadata through `DomainModule`.
+- Let vertical implementations contribute action definitions and domain metadata through `DomainModule`. The initial financial-support implementation currently lives beside that contract in `packages/domain` to keep the challenge workspace small.
 - Represent action confirmation requirements explicitly.
-- Avoid persistence until a concrete requirement and data lifecycle are defined.
+- Hide the in-memory support-case store behind `SupportCaseRepository`; durable persistence remains unselected.
 
 ## Package responsibilities
 
@@ -45,7 +45,7 @@ evaluation runner --> identical sample --> provider adapters --> metrics/results
 | `conversation` | turns, state, intents, entities, clarification outcome      | executing downstream side effects           |
 | `actions`      | action definition/executor contracts, confirmation policy   | hard-coded healthcare workflows             |
 | `benchmark`    | sample/result schemas, runner contract, normalization/WER   | fabricated or manually altered scores       |
-| `domain`       | extension contract for a selected vertical                  | platform-wide provider selection            |
+| `domain`       | extension contract and initial financial-support workflow   | platform-wide provider selection            |
 | `shared`       | identifiers and small cross-cutting primitives              | domain business logic                       |
 
 ## Key interfaces
@@ -61,15 +61,16 @@ The source definitions in `packages/*/src` are the canonical executable contract
 - `BenchmarkRunner.run(samples, providers, config)`
 - `EvaluationSample`, immutable provider configuration snapshots, distinct transcription/semantic/task results, and data-governance metadata
 
-## Intended request flow
+## Implemented request flow
 
-1. A channel captures user consent and audio.
-2. A configured speech adapter returns a provider-neutral transcription result.
-3. The interpreter derives intent/entities and identifies missing information.
-4. The conversation layer asks a clarification or proposes an action.
-5. The system explains and confirms a consequential action.
-6. A domain action adapter validates and executes the task.
-7. The channel communicates a plain-language outcome.
+1. The web client starts an in-memory conversation and submits text.
+2. Deterministic domain rules derive the `failed_transfer` intent and known fields.
+3. The service asks for each missing required field or creates a proposal and summary.
+4. The client submits explicit confirmation containing the proposal ID and revision.
+5. Generic action validation rejects mismatched confirmation before execution.
+6. The financial-support executor creates one simulated case through `SupportCaseRepository` and returns its reference.
+
+Later voice input ends at the existing channel-neutral `UserUtterance` boundary. It must not change the financial workflow or couple it to a speech vendor.
 
 ## Failure and safety posture
 
@@ -83,7 +84,7 @@ The source definitions in `packages/*/src` are the canonical executable contract
 
 ## Open technical decisions
 
-Provider SDKs, orchestration/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
+Provider SDKs, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
 
 ## TypeScript build strategy
 

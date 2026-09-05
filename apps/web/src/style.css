@@ -7,7 +7,7 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #13231a;
+  color: #17231b;
   background: #f4f1e8;
   font-synthesis: none;
 }
@@ -22,8 +22,28 @@ body {
   min-height: 100vh;
 }
 
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  padding: 0.75rem;
+  color: #fff;
+  background: #17452f;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
 main {
-  width: min(72rem, calc(100% - 2rem));
+  width: min(48rem, calc(100% - 2rem));
   margin: 0 auto;
   padding: clamp(3rem, 9vw, 8rem) 0;
 }
@@ -37,10 +57,10 @@ main {
 }
 
 h1 {
-  max-width: 12ch;
+  max-width: 13ch;
   margin: 1rem 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3.4rem, 10vw, 8rem);
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
   font-weight: 500;
   letter-spacing: -0.055em;
   line-height: 0.9;
@@ -48,17 +68,18 @@ h1 {
 
 .lede {
   max-width: 42rem;
-  margin: 2rem 0 4rem;
+  margin: 1.5rem 0 2rem;
   color: #435248;
   font-size: clamp(1.15rem, 2.4vw, 1.55rem);
   line-height: 1.5;
 }
 
-section {
-  padding: 2rem;
-  color: #f8f3e8;
-  background: #173e2c;
+.conversation {
+  padding: clamp(1rem, 4vw, 2rem);
+  color: #17231b;
+  background: #fff;
   border-radius: 1rem;
+  box-shadow: 0 1rem 3rem #17231b14;
 }
 
 h2 {
@@ -68,43 +89,153 @@ h2 {
   text-transform: uppercase;
 }
 
-ol {
+.history {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 1px;
-  margin: 2rem 0 0;
+  gap: 0.8rem;
+  max-height: 24rem;
+  margin: 0 0 1.5rem;
   padding: 0;
+  overflow-y: auto;
   list-style: none;
 }
 
-li {
-  padding: 1rem 0.5rem;
-  border-top: 1px solid #759380;
+.turn {
+  max-width: 88%;
+  padding: 0.85rem 1rem;
+  border-radius: 0.8rem;
+  line-height: 1.45;
 }
 
-li::before {
+.turn strong {
   display: block;
-  margin-bottom: 0.65rem;
-  color: #df9e75;
-  content: "0" counter(list-item);
-  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
 }
 
-aside {
-  margin-top: 1rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid #d7cbb8;
-  border-radius: 0.75rem;
-  color: #5a5147;
+.turn p {
+  margin: 0;
+}
+
+.assistant {
+  background: #e6f0e9;
+}
+
+.user {
+  justify-self: end;
+  background: #eee8dc;
+}
+
+.notice {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border: 2px solid #d29a42;
+  border-radius: 0.8rem;
+  background: #fff8e8;
   line-height: 1.55;
 }
 
-aside strong {
-  color: #13231a;
+form {
+  display: grid;
+  gap: 0.75rem;
 }
 
-@media (max-width: 700px) {
-  ol {
-    grid-template-columns: repeat(2, 1fr);
+label {
+  font-weight: 750;
+}
+
+textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #7b897f;
+  border-radius: 0.7rem;
+  resize: vertical;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+textarea:focus,
+button:focus-visible {
+  outline: 4px solid #e6ac42;
+  outline-offset: 2px;
+}
+
+button {
+  min-height: 3.5rem;
+  padding: 0.8rem 1.25rem;
+  border: 0;
+  border-radius: 0.7rem;
+  color: #fff;
+  background: #17452f;
+  cursor: pointer;
+  font-weight: 800;
+  touch-action: manipulation;
+  transition:
+    background-color 180ms ease-out,
+    opacity 180ms ease-out;
+}
+
+button:hover {
+  background: #0e3523;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.confirmation {
+  padding: 1rem;
+  border: 2px solid #17452f;
+  border-radius: 0.8rem;
+  background: #f0f7f2;
+}
+
+.small {
+  margin-bottom: 0;
+  color: #58635c;
+  font-size: 0.88rem;
+}
+
+.status {
+  min-height: 1.5rem;
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+.error {
+  color: #a01f17;
+}
+
+.success {
+  padding: 1rem;
+  border-radius: 0.6rem;
+  color: #0a3b25;
+  background: #dff3e7;
+  font-size: 1.15rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  main {
+    width: min(100% - 1rem, 48rem);
+    padding-top: 1.5rem;
+  }
+
+  .conversation {
+    padding: 1rem;
+  }
+
+  .turn {
+    max-width: 95%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }

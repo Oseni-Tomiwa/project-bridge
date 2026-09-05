@@ -37,6 +37,8 @@ When confidence is insufficient, ask a neutral clarification or decline safely. 
 
 High-risk verticals need domain-specific review, escalation paths, and regulatory analysis before real-world use. A challenge demo should use sandboxed or simulated downstream systems unless real execution has been explicitly approved and made safe.
 
+The current financial-support slice only creates a process-local simulated case after explicit confirmation. It does not authenticate users, inspect accounts, contact a bank, or move money. The API rejects obvious credential and long card/account-number patterns before adding an utterance to conversation state. This narrow pattern check is defense in depth for a demo, not reliable data-loss prevention; the UI also tells users not to submit these values. Logs, reverse proxies, browsers, and future integrations require their own controls before real user data is accepted.
+
 ## Fairness and evaluation
 
 Recruit with community participation and compensate fairly. Document who is represented and missing. Report slice-level errors and uncertainty without publishing tiny cells that risk re-identification. Include qualitative review of harmful substitutions, especially names, amounts, locations, negation, urgency, and other action-critical entities.

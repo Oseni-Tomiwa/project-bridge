@@ -20,7 +20,9 @@ Many digital and AI services assume that a user can read and write comfortably, 
 
 ## Not yet decided
 
-The first vertical, final product name, speech competitors, hosting provider, LLM/provider, production database, initial language pairs, and target countries remain open.
+The first **challenge** vertical is now financial-service support, limited to a simulated failed/pending-transfer support case. This does not make the long-term product financial-services-specific.
+
+The final product name, post-challenge vertical roadmap, speech competitors, hosting provider, LLM/provider, production database, initial benchmark language pairs, and target countries remain open.
 
 ## Evidence needed
 

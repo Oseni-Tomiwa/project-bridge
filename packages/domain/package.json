@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@project-bridge/actions": "workspace:*",
-    "@project-bridge/conversation": "workspace:*"
+    "@project-bridge/conversation": "workspace:*",
+    "@project-bridge/shared": "workspace:*"
   }
 }

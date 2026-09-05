@@ -36,7 +36,11 @@ importers:
         specifier: 3.2.4
         version: 3.2.4(@types/node@22.18.0)(supports-color@7.2.0)
 
-  apps/api: {}
+  apps/api:
+    dependencies:
+      '@project-bridge/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
 
   apps/web: {}
 
@@ -69,6 +73,9 @@ importers:
       '@project-bridge/conversation':
         specifier: workspace:*
         version: link:../conversation
+      '@project-bridge/shared':
+        specifier: workspace:*
+        version: link:../shared
 
   packages/shared: {}
 
