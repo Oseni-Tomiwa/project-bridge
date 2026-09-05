@@ -23,6 +23,9 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Collection protocol, recruitment, consent language, compensation, and dataset license
 - Transcript conventions and annotation/review process
 - Normalization profiles and handling of accepted orthographic variants
+- Native Yoruba, Nigerian Pidgin, and Nigerian English reviewer selection and disagreement resolution
+- Whether `yoruba-strict@0.1` becomes the frozen primary profile after language review
+- Speaker/condition sampling targets for the first consented Yoruba-first audio collection
 - Dataset size, power, splits, and minimum slice-reporting thresholds
 - Latency protocol, concurrency, regions, and retry policy
 - Provider-configuration ID/fingerprint generation and treatment of undocumented model version changes

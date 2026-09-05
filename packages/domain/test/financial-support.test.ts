@@ -7,8 +7,22 @@ import {
   FinancialSupportService,
   InMemorySupportCaseRepository,
   containsSensitiveFinancialInput,
-  financialSupportEvaluationFixtures,
 } from "../src/index.js";
+
+const representativeUtterances = [
+  [
+    "English",
+    "I sent 25000 yesterday and was debited, but the recipient did not receive it.",
+  ],
+  [
+    "Nigerian Pidgin",
+    "I send 25k yesterday, dem debit me but the person no receive am.",
+  ],
+  [
+    "English/Yoruba code-switch",
+    "I sent 25k yesterday, owo ti kuro but the person never receive am.",
+  ],
+] as const;
 
 function harness() {
   let sequence = 0;
@@ -34,19 +48,15 @@ async function interpret(text: string) {
 }
 
 describe("deterministic failed-transfer interpretation", () => {
-  it.each([
-    ["English", financialSupportEvaluationFixtures[0].utterance],
-    ["Nigerian Pidgin", financialSupportEvaluationFixtures[1].utterance],
-    [
-      "English/Yoruba code-switch",
-      financialSupportEvaluationFixtures[2].utterance,
-    ],
-  ])("recognizes the %s representative example", async (_label, utterance) => {
-    expect(await interpret(utterance)).toMatchObject({
-      kind: "clarification-required",
-      intent: { name: "failed_transfer" },
-    });
-  });
+  it.each(representativeUtterances)(
+    "recognizes the %s representative example",
+    async (_label, utterance) => {
+      expect(await interpret(utterance)).toMatchObject({
+        kind: "clarification-required",
+        intent: { name: "failed_transfer" },
+      });
+    },
+  );
 
   it("detects the missing recipient field", async () => {
     expect(

@@ -30,7 +30,10 @@ packages/
   shared/        Cross-package primitives
 evaluation/
   audio/          Local/private audio inputs (ignored by Git)
+  fixtures/       Synthetic versioned text ground truth
+  manifests/      Evaluation-layer fixture manifests
   metadata/       Versioned sample metadata manifests
+  profiles/       Versioned normalization profile registry
   results/        Generated benchmark outputs (ignored by Git)
 docs/             Product, architecture, evaluation, and safety notes
 ```
@@ -59,6 +62,7 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 - [MVP boundaries](docs/mvp-boundaries.md)
 - [Architecture](docs/architecture.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
+- [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
 - [Responsible AI](docs/responsible-ai.md)
 - [Open decisions](docs/open-decisions.md)
 - [Financial-support vertical](docs/vertical-financial-support.md)
@@ -66,6 +70,8 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 ## Data and secrets
 
 Do not commit credentials, raw participant audio, direct identifiers, consent evidence, or generated evaluation results that may contain personal data. The audio, result, and private-metadata paths are ignored by default. Metadata intended for version control must be de-identified and reviewed first.
+
+The current evaluation layer contains 36 synthetic Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. It contains no audio, provider output, scores, or fabricated metrics; the Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
 
 ## Current vertical
 

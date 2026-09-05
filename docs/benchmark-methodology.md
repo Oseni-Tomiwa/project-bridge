@@ -4,6 +4,8 @@
 
 Evaluate code-switched speech providers fairly and reproducibly, then measure whether transcription quality carries through to the selected downstream task. No benchmark has been run and this repository contains no scores.
 
+The initial text-only ground-truth layer and its limitations are documented in the [Yoruba-first evaluation plan](yoruba-evaluation-plan.md). It does not alter the governed audio-manifest and run requirements below.
+
 ## Dataset design
 
 Each de-identified sample should have a stable ID, an audio asset ID and SHA-256 digest, a human-verified reference transcript with annotation protocol/version, and stratification metadata:
@@ -46,6 +48,8 @@ Every persisted result repeats its sanitized provider configuration snapshot. Th
 WER = `(substitutions + deletions + insertions) / reference word count`. Record two separate measurements: raw WER using the versioned whitespace-tokenization policy without case, punctuation, or Unicode changes; and normalized WER using a declared, versioned normalization profile. Report corpus-level micro WER by summing edit counts before division, plus per-utterance distributions. Empty-reference samples produce a null WER and must not be silently discarded.
 
 Normalization choices—Unicode form, case folding, punctuation, whitespace, number handling, filler words, and orthographic variants—can change the result. Preserve both raw and normalized text. Do not transliterate or translate unless that is a separate, declared analysis.
+
+The Yoruba fixture layer defines `yoruba-strict@0.1` as the current primary candidate and `yoruba-diacritic-insensitive-analysis@0.1` as an optional sensitivity view. The latter must never be substituted silently for the primary result. The product/research team must review and freeze the primary profile before a measured run.
 
 ### Other transcription metrics
 

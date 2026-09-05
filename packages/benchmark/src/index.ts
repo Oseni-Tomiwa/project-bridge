@@ -4,6 +4,10 @@ import type {
   SpeechProvider,
   SpeechProviderConfiguration,
 } from "@project-bridge/speech";
+import type { NormalizationProfile } from "./normalization.js";
+
+export * from "./yoruba.js";
+export * from "./normalization.js";
 
 export interface RecordingDeviceMetadata {
   readonly category: string;
@@ -90,15 +94,6 @@ export interface PreparedEvaluationSample {
   readonly sample: EvaluationSample;
   readonly audio: AudioInput &
     Required<Pick<AudioInput, "sampleId" | "contentSha256">>;
-}
-
-export interface NormalizationProfile {
-  readonly id: string;
-  readonly version: string;
-  readonly unicodeForm: "NFC" | "NFKC";
-  readonly lowercase: boolean;
-  readonly removePunctuation: boolean;
-  readonly collapseWhitespace: boolean;
 }
 
 export interface WordErrorMetrics {

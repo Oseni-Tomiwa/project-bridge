@@ -44,6 +44,15 @@ importers:
 
   apps/web: {}
 
+  evaluation:
+    dependencies:
+      '@project-bridge/benchmark':
+        specifier: workspace:*
+        version: link:../packages/benchmark
+      '@project-bridge/shared':
+        specifier: workspace:*
+        version: link:../packages/shared
+
   packages/actions:
     dependencies:
       '@project-bridge/shared':
