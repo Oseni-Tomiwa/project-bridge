@@ -43,6 +43,10 @@ Every persisted result repeats its sanitized provider configuration snapshot. Th
 
 The implemented Intron/Sahara synchronous adapter records the `yo` language route, endpoint, transport, timeout, known duration limit, request timestamps, monotonic latency, success/failure state, and provider `file_id` when returned. It performs no hidden retry and does not calculate WER. Because the documented response does not expose the deployed model/version, the current configuration records the model identifier as `unknown` and omits model version; this limitation must accompany any future result.
 
+The implemented OpenAI adapter records the configured model identifier (default `gpt-transcribe`), endpoint, synchronous file-upload transport, JSON response mode, explicit absence of a language hint, client timeout, zero automatic retries, timestamps, monotonic request latency, success/failure state, and OpenAI request ID when returned. It sends one native HTTP attempt and does not calculate or normalize metrics. The currently documented `gpt-transcribe` alias has no distinct dated version, so `modelVersion` remains absent and alias drift must be treated as a reproducibility limitation.
+
+`evaluation/manifests/real-yo-001-comparison.v0.1.mts` prepares one reference/audio identity with separate Sahara, OpenAI, and future Deepgram result slots. It is not a runnable governed sample yet: checksum, duration, technical metadata, provenance, consent, third-party processing permission, license, retention, and reviewer state remain unverified. Provider hypotheses and latency do not belong in that preparation record and no OpenAI result is asserted.
+
 ## Metrics
 
 ### Normalized word error rate

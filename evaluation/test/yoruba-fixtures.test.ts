@@ -9,6 +9,7 @@ import {
 } from "@project-bridge/benchmark";
 import { yorubaFailedTransferFixtures } from "../fixtures/yoruba-failed-transfer.v0.1.mjs";
 import { yorubaFirstEvaluationManifest } from "../manifests/yoruba-first.v0.1.mjs";
+import { realYorubaComparisonPreparation } from "../manifests/real-yo-001-comparison.v0.1.mjs";
 
 describe("Yoruba-first fixture corpus", () => {
   it("contains 36 balanced, uniquely identified synthetic scenarios", () => {
@@ -151,5 +152,28 @@ describe("Yoruba evaluation manifest", () => {
       assets: [],
       note: "No audio or audio provenance is asserted by this manifest.",
     });
+  });
+
+  it("prepares one shared real sample for provider-specific result slots", () => {
+    expect(realYorubaComparisonPreparation.sample).toMatchObject({
+      id: "real-yo-001",
+      referenceTranscript: "mo transfer 50 thousands is account mi me o de re",
+      audio: {
+        assetId: "real-yo-001-source-audio",
+        handling: "byte-identical-source-required",
+        governanceStatus: "review-required",
+      },
+    });
+    expect(
+      realYorubaComparisonPreparation.providerResultSlots.map(
+        ({ providerId }) => providerId,
+      ),
+    ).toEqual(["intron-sahara", "openai", "deepgram"]);
+    expect(JSON.stringify(realYorubaComparisonPreparation)).not.toContain(
+      "hypothesisTranscript",
+    );
+    expect(JSON.stringify(realYorubaComparisonPreparation)).not.toContain(
+      "latencyMilliseconds",
+    );
   });
 });

@@ -16,6 +16,8 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Exact Sahara v2.5 deployed model identifier/version returned by the synchronous endpoint, if any
 - Whether challenge accounts require a challenge-specific model/configuration option
 - Whether the generic `yo` route automatically selects the Sahara v2.5 challenge model
+- Whether a dated/pinned OpenAI `gpt-transcribe` version becomes available and should replace the alias for measured runs
+- Whether OpenAI language hints should be a separate experiment, and how that configuration can be compared fairly with Sahara's `yo` route
 - Official Intron file-status contract for continuing a timed-out synchronous request
 - Intron streaming STT contract and any participant-specific code-switching parameter
 - Post-prototype interpretation approach (the current demo uses narrow deterministic rules)
@@ -33,6 +35,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Dataset size, power, splits, and minimum slice-reporting thresholds
 - Latency protocol, concurrency, regions, and retry policy
 - Provider-configuration ID/fingerprint generation and treatment of undocumented model version changes
+- Whether the first local sample may be sent to OpenAI and other third-party providers after consent, licensing, and retention review
 - Allowed-use vocabulary and systems of record for consent, licensing, and retention evidence
 - Definition of “transcription accuracy” in addition to WER
 - Task-completion rubric and safety error taxonomy

@@ -40,14 +40,14 @@ evaluation runner --> identical sample --> provider adapters --> metrics/results
 
 ## Package responsibilities
 
-| Package        | Owns                                                                  | Must not own                                             |
-| -------------- | --------------------------------------------------------------------- | -------------------------------------------------------- |
-| `speech`       | audio input, provider contract, transcript results, provider adapters | vendor-specific assumptions in conversation/domain types |
-| `conversation` | turns, state, intents, entities, clarification outcome                | executing downstream side effects                        |
-| `actions`      | action definition/executor contracts, confirmation policy             | hard-coded healthcare workflows                          |
-| `benchmark`    | sample/result schemas, runner contract, normalization/WER             | fabricated or manually altered scores                    |
-| `domain`       | extension contract and initial financial-support workflow             | platform-wide provider selection                         |
-| `shared`       | identifiers and small cross-cutting primitives                        | domain business logic                                    |
+| Package        | Owns                                                                       | Must not own                                             |
+| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `speech`       | audio input, provider contract, transcript results, Intron/OpenAI adapters | vendor-specific assumptions in conversation/domain types |
+| `conversation` | turns, state, intents, entities, clarification outcome                     | executing downstream side effects                        |
+| `actions`      | action definition/executor contracts, confirmation policy                  | hard-coded healthcare workflows                          |
+| `benchmark`    | sample/result schemas, runner contract, normalization/WER                  | fabricated or manually altered scores                    |
+| `domain`       | extension contract and initial financial-support workflow                  | platform-wide provider selection                         |
+| `shared`       | identifiers and small cross-cutting primitives                             | domain business logic                                    |
 
 ## Key interfaces
 
@@ -72,7 +72,7 @@ The source definitions in `packages/*/src` are the canonical executable contract
 5. Generic action validation rejects mismatched confirmation before execution.
 6. The financial-support executor creates one simulated case through `SupportCaseRepository` and returns its reference.
 
-Later voice input ends at the existing channel-neutral `UserUtterance` boundary. It must not change the financial workflow or couple it to a speech vendor.
+Later voice input ends at the existing channel-neutral `UserUtterance` boundary. Both implemented file-transcription adapters stop at the same `TranscriptionResult`; neither changes the financial workflow nor couples it to a speech vendor.
 
 ## Failure and safety posture
 
@@ -86,7 +86,7 @@ Later voice input ends at the existing channel-neutral `UserUtterance` boundary.
 
 ## Open technical decisions
 
-Additional providers, Sahara model/version selection, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
+Additional providers, Sahara model/version selection, OpenAI alias/version and language-hint policy, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
 
 ## TypeScript build strategy
 

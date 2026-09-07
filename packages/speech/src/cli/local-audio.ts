@@ -114,6 +114,8 @@ function mediaTypeForExtension(extension: string): string {
     case ".wav":
       return "audio/wav";
     case ".mp3":
+    case ".mpga":
+    case ".mpeg":
       return "audio/mpeg";
     case ".mp4":
     case ".m4a":

@@ -25,7 +25,7 @@ function nodeError(code: string): NodeJS.ErrnoException {
   return Object.assign(new Error(code), { code });
 }
 
-describe("Intron smoke-test local audio loading", () => {
+describe("provider smoke-test local audio loading", () => {
   it("skips pnpm's -- separator and reads an absolute macOS path", async () => {
     const expectedPath = "/Users/example/Downloads/yoruba-test.m4a";
     const argv = ["node", "intron-sahara-smoke.js", "--", expectedPath];
