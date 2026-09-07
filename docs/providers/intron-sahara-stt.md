@@ -77,6 +77,8 @@ pnpm --filter @project-bridge/speech smoke:intron -- /absolute/path/to/consented
 
 The script requires `INTRON_API_KEY` and an explicit path. It prints only provider, status, latency, transcript on success, and `file_id` when returned. It never prints the key and is not referenced by normal tests or CI.
 
+The pnpm `--` separator is ignored when locating the first audio-path argument. Relative paths are resolved from the current working directory; absolute filesystem paths are used directly. Before creating the provider, the CLI distinguishes `file-not-found`, `permission-denied`, `directory-not-file`, and `unreadable-or-invalid-local-file` without printing the path or raw filesystem error.
+
 ## Unresolved questions
 
 - Exact deployed Sahara v2.5 model identifier/version, if exposed by this endpoint

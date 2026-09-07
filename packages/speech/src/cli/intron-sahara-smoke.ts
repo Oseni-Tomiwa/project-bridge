@@ -1,14 +1,12 @@
-import { readFile } from "node:fs/promises";
-import { basename, extname } from "node:path";
-
 import {
   INTRON_SAHARA_PROVIDER_ID,
   IntronSaharaSpeechProvider,
 } from "../providers/intron-sahara.js";
+import { loadLocalAudio, resolveAudioPathFromArgv } from "./local-audio.js";
 
 async function main(): Promise<void> {
   const apiKey = process.env.INTRON_API_KEY?.trim();
-  const audioPath = process.argv[2];
+  const audioPath = resolveAudioPathFromArgv(process.argv, process.cwd());
   if (apiKey === undefined || apiKey === "") {
     safeFailure("missing-api-key");
     process.exitCode = 1;
@@ -27,11 +25,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  let bytes: Uint8Array;
-  try {
-    bytes = await readFile(audioPath);
-  } catch {
-    safeFailure("unreadable-audio-file");
+  const audio = await loadLocalAudio(audioPath);
+  if (!audio.ok) {
+    safeFailure(audio.status);
     process.exitCode = 1;
     return;
   }
@@ -52,9 +48,9 @@ async function main(): Promise<void> {
   }
   const outcome = await provider.transcribe(
     {
-      bytes,
-      fileName: basename(audioPath),
-      mediaType: mediaTypeForExtension(extname(audioPath)),
+      bytes: audio.value.bytes,
+      fileName: audio.value.fileName,
+      mediaType: audio.value.mediaType,
     },
     {},
   );
@@ -82,26 +78,6 @@ function safeFailure(status: string): void {
   console.log(`provider: ${INTRON_SAHARA_PROVIDER_ID}`);
   console.log(`status: ${status}`);
   console.log("latency_ms: 0");
-}
-
-function mediaTypeForExtension(extension: string): string {
-  switch (extension.toLowerCase()) {
-    case ".wav":
-      return "audio/wav";
-    case ".mp3":
-      return "audio/mpeg";
-    case ".mp4":
-    case ".m4a":
-      return "audio/mp4";
-    case ".ogg":
-      return "audio/ogg";
-    case ".webm":
-      return "audio/webm";
-    case ".flac":
-      return "audio/flac";
-    default:
-      return "application/octet-stream";
-  }
 }
 
 await main();
