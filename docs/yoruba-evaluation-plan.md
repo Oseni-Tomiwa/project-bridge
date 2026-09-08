@@ -50,6 +50,8 @@ The selected Deepgram baseline is Nova-3 with explicit `language=multi`, request
 
 The preparation record `evaluation/manifests/real-yo-001-comparison.v0.1.mts` reserves one shared sample/audio identity and separate provider-result slots without duplicating its human reference. It does not promote the local file into the governed dataset or assert missing checksum, provenance, consent, license, retention, device, reviewer, or technical metadata. The exact reference text must remain unchanged. Any live comparison should use byte-identical `~/Downloads/yoruba-test.m4a`; if transcoding becomes necessary, stop and revise the protocol before collecting results.
 
+The batch runner is ready for local/mock manifests and fake-provider tests. It verifies checksums and checkpoints raw provider/sample outcomes, but it has not executed AfriSwitch or produced comparative evidence. Sahara/OpenAI/Deepgram batch execution begins only after the official 75-sample materialization succeeds and its governance gates are approved.
+
 ## Future metric mapping
 
 - Transcription scoring will compare each provider hypothesis with the canonical reference, retaining raw WER and separately applying the frozen normalization profile for normalized WER.

@@ -64,6 +64,7 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 - [MVP boundaries](docs/mvp-boundaries.md)
 - [Architecture](docs/architecture.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
+- [Batch STT benchmark runner](docs/stt-batch-runner.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
 - [AfriSwitch Yoruba dataset preparation](docs/datasets/afriswitch-yoruba.md)
 - [Intron/Sahara STT adapter](docs/providers/intron-sahara-stt.md)
@@ -80,6 +81,8 @@ Do not commit credentials, raw participant audio, direct identifiers, consent ev
 The current evaluation layer contains 36 synthetic Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. It contains no audio, provider output, scores, or fabricated metrics; the Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
 
 The official `intronhealth/AfriSwitch` Yoruba `test` split is configured as the primary external code-switching ASR source. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the Hugging Face revision remains unresolved until the first materialization run. No dataset audio is committed or downloaded by normal checks. The opt-in preparation script downloads only the selected clips and writes a checksummed local manifest; see the [dataset guide](docs/datasets/afriswitch-yoruba.md). AfriSwitch results must remain identified separately from Project Bridge's synthetic and domain-specific samples.
+
+A sequential, resumable STT batch runner can validate local/mock or materialized manifests, verify audio checksums, and checkpoint provider/sample successes or failures under the gitignored `evaluation/results/` directory. Its automated tests use fake providers only. No AfriSwitch benchmark has been executed; the three-provider comparison begins only after official materialization succeeds. See the [runner guide](docs/stt-batch-runner.md).
 
 Each real provider adapter has a separate, explicit smoke test. None is run by normal checks:
 

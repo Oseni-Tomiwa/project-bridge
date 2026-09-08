@@ -52,6 +52,9 @@ importers:
       '@project-bridge/shared':
         specifier: workspace:*
         version: link:../packages/shared
+      '@project-bridge/speech':
+        specifier: workspace:*
+        version: link:../packages/speech
 
   packages/actions:
     dependencies:

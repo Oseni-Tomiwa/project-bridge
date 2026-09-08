@@ -45,6 +45,8 @@ For AfriSwitch, the preparation manifest requires one downloaded/checksummed aud
 
 Every persisted result repeats its sanitized provider configuration snapshot. The foundation exposes a consistency check that compares the result snapshot with the matching configuration ID in the frozen run; a runner must reject the result if the run ID, model version, region, or options differ.
 
+The implemented v0.1 batch runner executes sequentially in stable sample-ID/provider-ID order. It validates the complete manifest and planned audio checksums before writing, then writes and syncs each success or failure as a JSONL checkpoint. Resume skips only an exact execution identity; it refuses mismatched run metadata, manifest content, configuration snapshots, normalization/scoring versions, and duplicate records. Dry-run performs the same manifest/audio/configuration preflight without credentials, network requests, or output files. See the [batch runner guide](stt-batch-runner.md).
+
 The implemented Intron/Sahara synchronous adapter records the `yo` language route, endpoint, transport, timeout, known duration limit, request timestamps, monotonic latency, success/failure state, and provider `file_id` when returned. It performs no hidden retry and does not calculate WER. Because the documented response does not expose the deployed model/version, the current configuration records the model identifier as `unknown` and omits model version; this limitation must accompany any future result.
 
 The implemented OpenAI adapter records the configured model identifier (default `gpt-transcribe`), endpoint, synchronous file-upload transport, JSON response mode, explicit absence of a language hint, client timeout, zero automatic retries, timestamps, monotonic request latency, success/failure state, and OpenAI request ID when returned. It sends one native HTTP attempt and does not calculate or normalize metrics. The currently documented `gpt-transcribe` alias has no distinct dated version, so `modelVersion` remains absent and alias drift must be treated as a reproducibility limitation.
@@ -52,6 +54,8 @@ The implemented OpenAI adapter records the configured model identifier (default 
 The implemented Deepgram adapter records `nova-3`, requested version `latest`, explicit `language=multi`, explicit `smart_format=false`, disabled language detection, the prerecorded binary transport, timeout, and zero retries. It retains request ID and provider-reported model UUID/name/version/architecture only when returned. Nova-3 multilingual baseline evaluated out-of-distribution on Yoruba-English code-switched speech; Yoruba is not an officially supported Nova-3 multilingual language. Smart Format, automatic detection, and other language settings require distinct configuration IDs and separate reporting.
 
 `evaluation/manifests/real-yo-001-comparison.v0.1.mts` prepares one reference/audio identity with separate Sahara, OpenAI, and Deepgram result slots. It is not a runnable governed sample yet: checksum, duration, technical metadata, provenance, consent, third-party processing permission, license, retention, and reviewer state remain unverified. Provider hypotheses and latency do not belong in that preparation record and no OpenAI or Deepgram result is asserted.
+
+No AfriSwitch batch has run. The batch runner's test records come only from local temporary fixtures and fake providers; they are not benchmark evidence. Real comparison starts only after the official frozen 75-sample manifest and audio are materialized successfully.
 
 ## Metrics
 

@@ -42,6 +42,8 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Speaker/condition sampling targets for the first consented Yoruba-first audio collection
 - Dataset size, power, splits, and minimum slice-reporting thresholds
 - Latency protocol, concurrency, regions, and retry policy
+- Run-ID ownership/naming, explicit retry-attempt identity, and archival/publication workflow for batch result directories
+- Whether later benchmark protocol versions should rotate or randomize provider order instead of v0.1's deterministic sequential order
 - Provider-configuration ID/fingerprint generation and treatment of undocumented model version changes
 - Whether the first local sample may be sent to OpenAI and other third-party providers after consent, licensing, and retention review
 - Allowed-use vocabulary and systems of record for consent, licensing, and retention evidence

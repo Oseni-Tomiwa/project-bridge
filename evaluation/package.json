@@ -4,11 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "benchmark:stt": "pnpm --filter @project-bridge/benchmark build && pnpm --filter @project-bridge/speech build && node scripts/run-stt-benchmark.mjs",
     "prepare:afriswitch:yoruba": "pnpm --filter @project-bridge/benchmark build && node scripts/prepare-afriswitch-yoruba.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@project-bridge/benchmark": "workspace:*",
-    "@project-bridge/shared": "workspace:*"
+    "@project-bridge/shared": "workspace:*",
+    "@project-bridge/speech": "workspace:*"
   }
 }
