@@ -4,7 +4,7 @@
 
 Project Bridge explores a voice-first AI access layer through which a person can speak naturally, be understood across code-switched speech, clarify missing information, confirm consequential actions, trigger a downstream task, and receive an accessible response.
 
-The first vertical slice is a simulated failed/pending-transfer support journey. It uses deterministic text rules, asks for missing information, presents a summary for explicit confirmation, and creates an in-memory support case. It does **not** connect to a bank or perform a banking action. Opt-in Intron/Sahara and OpenAI file-transcription adapters are implemented, but neither is wired into the web/API journey and no comparative benchmark has been run. An LLM, Deepgram, durable storage, authentication, and TTS are not implemented.
+The first vertical slice is a simulated failed/pending-transfer support journey. It uses deterministic text rules, asks for missing information, presents a summary for explicit confirmation, and creates an in-memory support case. It does **not** connect to a bank or perform a banking action. Opt-in Intron/Sahara, OpenAI, and Deepgram file-transcription adapters are implemented, but none is wired into the web/API journey and no comparative benchmark has been run. An LLM, durable storage, authentication, and TTS are not implemented.
 
 ## Decision labels
 
@@ -68,6 +68,7 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 - [AfriSwitch Yoruba dataset preparation](docs/datasets/afriswitch-yoruba.md)
 - [Intron/Sahara STT adapter](docs/providers/intron-sahara-stt.md)
 - [OpenAI STT adapter](docs/providers/openai-stt.md)
+- [Deepgram STT adapter](docs/providers/deepgram-stt.md)
 - [Responsible AI](docs/responsible-ai.md)
 - [Open decisions](docs/open-decisions.md)
 - [Financial-support vertical](docs/vertical-financial-support.md)
@@ -80,14 +81,15 @@ The current evaluation layer contains 36 synthetic Yoruba-first text fixtures ac
 
 The official `intronhealth/AfriSwitch` Yoruba `test` split is configured as the primary external code-switching ASR source. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the Hugging Face revision remains unresolved until the first materialization run. No dataset audio is committed or downloaded by normal checks. The opt-in preparation script downloads only the selected clips and writes a checksummed local manifest; see the [dataset guide](docs/datasets/afriswitch-yoruba.md). AfriSwitch results must remain identified separately from Project Bridge's synthetic and domain-specific samples.
 
-Each real provider adapter has a separate, explicit smoke test. Neither is run by normal checks:
+Each real provider adapter has a separate, explicit smoke test. None is run by normal checks:
 
 ```bash
 pnpm --filter @project-bridge/speech smoke:intron -- /absolute/path/to/consented-sample.wav
 pnpm --filter @project-bridge/speech smoke:openai -- /absolute/path/to/consented-sample.m4a
+pnpm --filter @project-bridge/speech smoke:deepgram -- /absolute/path/to/consented-sample.m4a
 ```
 
-The commands require their respective API keys; read the [Intron guide](docs/providers/intron-sahara-stt.md) or [OpenAI guide](docs/providers/openai-stt.md) before uploading any audio. Automated tests use mocked HTTP and do not make paid calls. No live OpenAI result is recorded in the repository.
+The commands require their respective API keys; read the provider guides before uploading any audio. Automated tests use mocked HTTP and do not make paid calls. No live OpenAI or Deepgram result is recorded in the repository. Nova-3 multilingual baseline evaluated out-of-distribution on Yoruba-English code-switched speech; Yoruba is not an officially supported Nova-3 multilingual language.
 
 ## Current vertical
 

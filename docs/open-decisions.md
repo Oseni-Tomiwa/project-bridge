@@ -18,6 +18,9 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Whether the generic `yo` route automatically selects the Sahara v2.5 challenge model
 - Whether a dated/pinned OpenAI `gpt-transcribe` version becomes available and should replace the alias for measured runs
 - Whether OpenAI language hints should be a separate experiment, and how that configuration can be compared fairly with Sahara's `yo` route
+- Whether Deepgram offers a requestable dated Nova-3 version that can replace `version=latest` for frozen runs
+- Whether to add separately reported Deepgram language-detection, omitted-language, or Smart Format experiments; none may replace the selected `language=multi`, `smart_format=false` baseline silently
+- How benchmark reporting should qualify Deepgram results given that Yoruba is not listed for Nova-3 multilingual support
 - Official Intron file-status contract for continuing a timed-out synchronous request
 - Intron streaming STT contract and any participant-specific code-switching parameter
 - Post-prototype interpretation approach (the current demo uses narrow deterministic rules)

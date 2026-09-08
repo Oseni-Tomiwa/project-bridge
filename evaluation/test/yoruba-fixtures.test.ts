@@ -191,6 +191,11 @@ describe("Yoruba evaluation manifest", () => {
         ({ providerId }) => providerId,
       ),
     ).toEqual(["intron-sahara", "openai", "deepgram"]);
+    expect(realYorubaComparisonPreparation.providerResultSlots[2]).toEqual({
+      providerId: "deepgram",
+      status: "not-run",
+      configurationId: "deepgram-prerecorded-nova-3-multi-smart-format-off-v1",
+    });
     expect(JSON.stringify(realYorubaComparisonPreparation)).not.toContain(
       "hypothesisTranscript",
     );

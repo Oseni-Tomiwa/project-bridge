@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "smoke:deepgram": "pnpm build && node dist/cli/deepgram-smoke.js",
     "smoke:intron": "pnpm build && node dist/cli/intron-sahara-smoke.js",
     "smoke:openai": "pnpm build && node dist/cli/openai-smoke.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"

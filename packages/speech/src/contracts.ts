@@ -42,11 +42,20 @@ export interface TranscriptSegment {
   readonly language?: string;
 }
 
+/** Provider-reported model identity, kept separate from requested configuration. */
+export interface ProviderModelMetadata {
+  readonly identifier?: string;
+  readonly version?: string;
+  readonly reference?: string;
+  readonly architecture?: string;
+}
+
 export interface TranscriptionResult {
   readonly providerConfiguration: SpeechProviderConfiguration;
   readonly text: string;
   readonly segments: readonly TranscriptSegment[];
   readonly detectedLanguages?: readonly string[];
+  readonly providerModelMetadata?: ProviderModelMetadata;
   readonly providerStatus?: string;
   readonly startedAt: string;
   readonly completedAt: string;

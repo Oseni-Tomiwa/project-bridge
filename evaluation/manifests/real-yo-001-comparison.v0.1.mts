@@ -20,6 +20,10 @@ export const realYorubaComparisonPreparation = {
   providerResultSlots: [
     { providerId: "intron-sahara", status: "not-imported" },
     { providerId: "openai", status: "not-run" },
-    { providerId: "deepgram", status: "not-integrated" },
+    {
+      providerId: "deepgram",
+      status: "not-run",
+      configurationId: "deepgram-prerecorded-nova-3-multi-smart-format-off-v1",
+    },
   ],
 } as const;

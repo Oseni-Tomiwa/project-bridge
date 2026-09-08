@@ -19,8 +19,8 @@
 | --------------------------- | ---------------------------------- |
 | Provider-neutral repository | Foundation created                 |
 | Specific vertical           | Financial-service support selected |
-| Sahara integration          | Not implemented                    |
-| Competitor integrations     | Not selected or implemented        |
+| Sahara integration          | Prerecorded adapter implemented    |
+| Competitor integrations     | OpenAI and Deepgram adapters added |
 | Speech dataset              | Not collected                      |
 | Benchmark execution         | Contracts only; no results         |
 | Downstream action           | Simulated support-case creation    |
