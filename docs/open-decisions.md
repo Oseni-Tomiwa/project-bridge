@@ -26,6 +26,11 @@ Nothing in this list is selected unless moved to a dated decision record.
 
 ## Data and evaluation
 
+- Exact AfriSwitch source revision to freeze for the first measured run
+- Legal/product approval for CC BY-NC-SA 4.0 obligations, third-party provider processing, attribution, derived results, and intended use
+- Local access, retention/deletion, and cleanup policy for materialized AfriSwitch audio and manifests
+- Whether all compared providers accept the original AfriSwitch source format; if not, one shared canonical transcoding specification
+- Versioned CER definition/implementation, including Unicode and empty-reference handling
 - Collection protocol, recruitment, consent language, compensation, and dataset license
 - Transcript conventions and annotation/review process
 - Normalization profiles and handling of accepted orthographic variants

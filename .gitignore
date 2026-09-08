@@ -12,6 +12,8 @@ coverage/
 evaluation/audio/*
 !evaluation/audio/.gitkeep
 !evaluation/audio/README.md
+evaluation/data/*
+!evaluation/data/README.md
 evaluation/metadata/private/
 evaluation/metadata/**/*.private.*
 evaluation/results/*

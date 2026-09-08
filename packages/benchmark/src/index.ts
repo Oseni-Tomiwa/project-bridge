@@ -8,6 +8,7 @@ import type { NormalizationProfile } from "./normalization.js";
 
 export * from "./yoruba.js";
 export * from "./normalization.js";
+export * from "./afriswitch.js";
 
 export interface RecordingDeviceMetadata {
   readonly category: string;

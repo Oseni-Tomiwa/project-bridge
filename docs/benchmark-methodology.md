@@ -6,6 +6,8 @@ Evaluate code-switched speech providers fairly and reproducibly, then measure wh
 
 The initial text-only ground-truth layer and its limitations are documented in the [Yoruba-first evaluation plan](yoruba-evaluation-plan.md). It does not alter the governed audio-manifest and run requirements below.
 
+The primary external code-switching ASR source is the official `intronhealth/AfriSwitch` dataset with config `yoruba` and split `test`. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the source revision remains unresolved until materialization. Its deterministic, opt-in preparation process is documented in the [AfriSwitch Yoruba guide](datasets/afriswitch-yoruba.md). Official-source, Project Bridge synthetic, and Project Bridge domain-recording results are distinct dataset slices and must not be pooled without source labels and separate counts.
+
 ## Dataset design
 
 Each de-identified sample should have a stable ID, an audio asset ID and SHA-256 digest, a human-verified reference transcript with annotation protocol/version, and stratification metadata:
@@ -39,6 +41,8 @@ Report sample counts and audio duration overall and per slice. Identify repeated
 7. Store raw provider responses privately when terms and consent allow; derive immutable result records.
 8. Calculate metrics from code, not by hand, and preserve the run configuration with outputs.
 
+For AfriSwitch, the preparation manifest requires one downloaded/checksummed audio asset per selected source row and declares no preprocessing or transcoding. All provider runs reference that one asset. If any provider cannot accept the original format, preparation must stop until one canonical conversion policy can be applied equally and recorded with transformation provenance and input/output checksums.
+
 Every persisted result repeats its sanitized provider configuration snapshot. The foundation exposes a consistency check that compares the result snapshot with the matching configuration ID in the frozen run; a runner must reject the result if the run ID, model version, region, or options differ.
 
 The implemented Intron/Sahara synchronous adapter records the `yo` language route, endpoint, transport, timeout, known duration limit, request timestamps, monotonic latency, success/failure state, and provider `file_id` when returned. It performs no hidden retry and does not calculate WER. Because the documented response does not expose the deployed model/version, the current configuration records the model identifier as `unknown` and omits model version; this limitation must accompany any future result.
@@ -60,7 +64,7 @@ The Yoruba fixture layer defines `yoruba-strict@0.1` as the current primary cand
 ### Other transcription metrics
 
 - Exact-match or token accuracy only with an explicit definition.
-- Character error rate where word boundaries are ambiguous.
+- Character error rate where word boundaries are ambiguous. CER is planned for the AfriSwitch ASR slice but is not implemented yet.
 - Language/code-switch preservation measures once language pairs are selected.
 - Failure/empty transcript rate.
 
@@ -84,6 +88,8 @@ These are separate result objects rather than aliases for “accuracy”:
 
 A successful transcript does not imply semantic correctness or task completion.
 
+AfriSwitch is used primarily for WER, future CER, failure, and latency analysis. Its general conversational rows receive no fabricated financial intent, entity, action, or downstream task labels. Those evaluations remain on separately identified Project Bridge domain fixtures and recordings.
+
 ## Analysis and reporting
 
 Report aggregate results and slices by language pair, domain, accent/country, device, and noise condition when sample sizes permit. Include confidence intervals and paired comparisons because providers process the same samples. Publish limitations, exclusions, missingness, failed requests, provider configuration, dataset composition, and cost where permitted.
@@ -97,6 +103,7 @@ Do not tune prompts, normalization rules, aliases, or thresholds on the final te
 ## Initial artifact layout
 
 - `evaluation/audio/`: local/private recordings; ignored by Git.
+- `evaluation/data/`: locally materialized external datasets and their frozen manifests; ignored by Git.
 - `evaluation/metadata/`: reviewed, de-identified manifests safe to version; private subdirectories and `*.private.*` files are ignored.
 - `evaluation/results/`: generated/private outputs; ignored by Git.
 

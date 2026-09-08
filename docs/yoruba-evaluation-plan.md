@@ -4,6 +4,8 @@
 
 **Decision:** the first versioned ground-truth fixture layer is Yoruba-first and limited to the simulated failed/pending-transfer support flow. It contains 36 synthetic, text-only scenarios. It is not collected speech, a model benchmark, evidence of model behavior, or a claim of comprehensive Yoruba support.
 
+**Decision:** the official `intronhealth/AfriSwitch` Yoruba `test` split is the primary external ASR benchmark source. Project Bridge v0.1 freezes the first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; its Hugging Face revision will be resolved and frozen during the first materialization run. Its approximately 5 hours/1,877 general conversational Yoruba-English utterances remain a separate source from the 36 Project Bridge synthetic/domain fixtures and from `real-yo-001`. AfriSwitch supplies ASR references and mixing metadata, not automatic failed-transfer ground truth.
+
 The fixtures live in `evaluation/fixtures/yoruba-failed-transfer.v0.1.mts`. They are evenly divided across four declared language-mix slices: Yoruba-heavy, Yoruba-English code-switching, Yoruba-Pidgin code-switching, and Nigerian English. Within each slice, the corpus covers complete requests, missing required information, unsupported requests, and credential-like input that must be rejected without retaining a credential value.
 
 Yoruba is the initial focus because the project needs one concrete language context in which to test code-switching, orthographic variation, clarification, and safety labels. This is a project sequencing decision, not an empirical conclusion that one language, dialect, or provider is more important or performs better.
@@ -55,6 +57,8 @@ The preparation record `evaluation/manifests/real-yo-001-comparison.v0.1.mts` re
 - Downstream success will require the declared final result, including explicit confirmation for an eligible support-case action. Transcription, intent, entity, clarification, and task results remain distinct records.
 - Provider latency will be recorded only when real provider calls exist and will not be fabricated for these text fixtures.
 
+For the external AfriSwitch slice, preserve the official raw and tagged transcripts, then compute strict normalized WER and the optional diacritic-insensitive sensitivity view separately. CER requires a versioned implementation before it can be reported. Intent/entity/task evaluation is absent unless a particular utterance later receives justified, reviewed domain annotation; it must never be inferred from the dataset's ASR labels.
+
 ## Known limitations and review gates
 
 - The corpus is small, hand-authored, synthetic, and scoped to one intent; it cannot estimate real-world accuracy.
@@ -63,3 +67,4 @@ The preparation record `evaluation/manifests/real-yo-001-comparison.v0.1.mts` re
 - Canonical transcripts sometimes restore Yoruba diacritics omitted from the synthetic user-text variant; the annotation guide must decide whether that mirrors the eventual audio transcription policy.
 - Slice sizes are useful for fixture coverage, not statistical comparison.
 - The exact audio protocol, primary normalization profile, entity matching rules, and task-success rubric remain product/research decisions.
+- The AfriSwitch source revision, license/commercial-use interpretation, provider-processing approval, attribution/share-alike treatment, and retention policy remain unresolved before materialization or provider runs.

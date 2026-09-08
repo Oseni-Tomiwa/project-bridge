@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare:afriswitch:yoruba": "pnpm --filter @project-bridge/benchmark build && node scripts/prepare-afriswitch-yoruba.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

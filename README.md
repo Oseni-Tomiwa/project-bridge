@@ -30,11 +30,13 @@ packages/
   shared/        Cross-package primitives
 evaluation/
   audio/          Local/private audio inputs (ignored by Git)
+  data/           Locally materialized external datasets (ignored by Git)
   fixtures/       Synthetic versioned text ground truth
   manifests/      Evaluation-layer fixture manifests
   metadata/       Versioned sample metadata manifests
   profiles/       Versioned normalization profile registry
   results/        Generated benchmark outputs (ignored by Git)
+  scripts/        Explicit external-dataset preparation tools
 docs/             Product, architecture, evaluation, and safety notes
 ```
 
@@ -63,6 +65,7 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 - [Architecture](docs/architecture.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
+- [AfriSwitch Yoruba dataset preparation](docs/datasets/afriswitch-yoruba.md)
 - [Intron/Sahara STT adapter](docs/providers/intron-sahara-stt.md)
 - [OpenAI STT adapter](docs/providers/openai-stt.md)
 - [Responsible AI](docs/responsible-ai.md)
@@ -74,6 +77,8 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 Do not commit credentials, raw participant audio, direct identifiers, consent evidence, or generated evaluation results that may contain personal data. The audio, result, and private-metadata paths are ignored by default. Metadata intended for version control must be de-identified and reviewed first.
 
 The current evaluation layer contains 36 synthetic Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. It contains no audio, provider output, scores, or fabricated metrics; the Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
+
+The official `intronhealth/AfriSwitch` Yoruba `test` split is configured as the primary external code-switching ASR source. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the Hugging Face revision remains unresolved until the first materialization run. No dataset audio is committed or downloaded by normal checks. The opt-in preparation script downloads only the selected clips and writes a checksummed local manifest; see the [dataset guide](docs/datasets/afriswitch-yoruba.md). AfriSwitch results must remain identified separately from Project Bridge's synthetic and domain-specific samples.
 
 Each real provider adapter has a separate, explicit smoke test. Neither is run by normal checks:
 

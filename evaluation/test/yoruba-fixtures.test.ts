@@ -8,6 +8,7 @@ import {
   type YorubaEvaluationFixture,
 } from "@project-bridge/benchmark";
 import { yorubaFailedTransferFixtures } from "../fixtures/yoruba-failed-transfer.v0.1.mjs";
+import { afriSwitchYorubaChallengePreparation } from "../manifests/afriswitch-yoruba-challenge.v0.1.mjs";
 import { yorubaFirstEvaluationManifest } from "../manifests/yoruba-first.v0.1.mjs";
 import { realYorubaComparisonPreparation } from "../manifests/real-yo-001-comparison.v0.1.mjs";
 
@@ -143,6 +144,27 @@ describe("Yoruba normalization profiles", () => {
 });
 
 describe("Yoruba evaluation manifest", () => {
+  it("keeps AfriSwitch source selection explicit and result-free", () => {
+    expect(afriSwitchYorubaChallengePreparation).toMatchObject({
+      status: "selection-config-frozen-awaiting-materialization",
+      source: {
+        datasetId: "intronhealth/AfriSwitch",
+        datasetConfig: "yoruba",
+        split: "test",
+        revision: null,
+        license: "CC-BY-NC-SA-4.0",
+      },
+      selection: {
+        seed: "project-bridge-challenge-v1",
+        requestedSampleCount: 75,
+        actualSampleCount: 0,
+        providerPerformanceUsed: false,
+      },
+      downstreamLabels: "not-provided",
+      benchmarkResults: [],
+    });
+  });
+
   it("indexes every fixture without claiming audio provenance", () => {
     expect(yorubaFirstEvaluationManifest.fixtureIds).toEqual(
       yorubaFailedTransferFixtures.map(({ sampleId }) => sampleId),
