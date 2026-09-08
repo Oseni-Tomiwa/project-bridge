@@ -13,10 +13,13 @@ import {
   selectAfriSwitchSubset,
   validateAfriSwitchSourceRows,
 } from "@project-bridge/benchmark";
+import {
+  fetchDatasetViewerRowsPage,
+  fetchSignedAudioAsset,
+  resolveDatasetRevision,
+} from "./hugging-face-dataset-viewer.mjs";
 
 const projectRoot = fileURLToPath(new URL("../../", import.meta.url));
-const viewerBaseUrl = "https://datasets-server.huggingface.co";
-const hubBaseUrl = "https://huggingface.co";
 const pageSize = 100;
 
 async function main() {
@@ -71,7 +74,7 @@ async function main() {
     const outputFile = resolve(audioDirectory, `${mapped.id}${extension}`);
     // The rows API returns a signed asset URL. Do not forward the Hub token to
     // that potentially different host.
-    const response = await fetch(sourceRow.audioUrl);
+    const response = await fetchSignedAudioAsset(sourceRow.audioUrl);
     if (!response.ok) {
       throw new Error(
         `Audio download failed for source row ${sourceRow.rowIndex}: HTTP ${response.status}.`,
@@ -167,18 +170,6 @@ function parseArguments(arguments_) {
   };
 }
 
-async function resolveDatasetRevision(requestedRevision, token) {
-  const url = new URL(
-    `/api/datasets/${AFRISWITCH_DATASET_ID}/revision/${encodeURIComponent(requestedRevision)}`,
-    hubBaseUrl,
-  );
-  const value = await fetchJson(url, token);
-  if (!isRecord(value) || typeof value.sha !== "string" || value.sha === "") {
-    throw new Error("Hugging Face did not return a resolved dataset revision.");
-  }
-  return value.sha;
-}
-
 async function fetchSourceRows(token) {
   const rows = [];
   let total = undefined;
@@ -187,13 +178,7 @@ async function fetchSourceRows(token) {
     total === undefined || offset < total;
     offset += pageSize
   ) {
-    const url = new URL("/rows", viewerBaseUrl);
-    url.searchParams.set("dataset", AFRISWITCH_DATASET_ID);
-    url.searchParams.set("config", AFRISWITCH_YORUBA_CONFIG);
-    url.searchParams.set("split", AFRISWITCH_TEST_SPLIT);
-    url.searchParams.set("offset", String(offset));
-    url.searchParams.set("length", String(pageSize));
-    const payload = await fetchJson(url, token);
+    const payload = await fetchDatasetViewerRowsPage(offset, pageSize, token);
     if (
       !isRecord(payload) ||
       !Array.isArray(payload.rows) ||
@@ -243,22 +228,6 @@ function parseViewerRow(value) {
     cmi: row.cmi,
     numSwitchPoints: row.num_switch_points,
   };
-}
-
-async function fetchJson(url, token) {
-  const response = await fetch(url, { headers: authorizationHeaders(token) });
-  if (!response.ok) {
-    throw new Error(
-      `Hugging Face request failed with HTTP ${response.status}.`,
-    );
-  }
-  return await response.json();
-}
-
-function authorizationHeaders(token) {
-  return token === undefined || token === ""
-    ? {}
-    : { Authorization: `Bearer ${token}` };
 }
 
 async function assertOutputDoesNotExist(path) {

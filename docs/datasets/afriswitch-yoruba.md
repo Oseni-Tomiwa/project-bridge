@@ -67,7 +67,9 @@ pnpm --filter @project-bridge/evaluation prepare:afriswitch:yoruba -- \
 
 The materializer resolves `main` before and after reading the row catalog and aborts if it changes. `--expected-revision` adds an explicit equality check; the rows API cannot request an arbitrary historical revision, so this option must not be described as a historical checkout.
 
-`HF_TOKEN` is optional for this public dataset. It is used only for Hugging Face metadata requests, is never recorded, and is not forwarded to signed audio asset hosts. The command refuses to overwrite an existing output directory. If preparation fails partway through, inspect or remove that incomplete ignored directory before retrying.
+`HF_TOKEN` is required for gated Dataset Viewer access and is optional only for public Hub metadata. It is used only for Hugging Face API requests, is never recorded, and is not forwarded to signed audio asset hosts. The command refuses to overwrite an existing output directory. If preparation fails partway through, inspect or remove that incomplete ignored directory before retrying.
+
+AfriSwitch is currently manually gated on Hugging Face even though its repository is public. The account associated with `HF_TOKEN` must be granted dataset access. The Hub revision endpoint can expose public repository metadata even when that token/account cannot retrieve Dataset Viewer rows, so a successful revision lookup alone does not prove row access. A rows HTTP 404 is reported with the sanitized request URL and an explicit gated-access diagnostic. The `/rows` request contains only `dataset`, `config`, `split`, `offset`, and `length`; the resolved revision is verified separately through the Hub API before and after catalog retrieval and is never appended to the Dataset Viewer query.
 
 ## Transcript and audio policy
 
