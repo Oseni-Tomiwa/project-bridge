@@ -109,7 +109,8 @@ describe("Vocal Money public preparation", () => {
       audioMediaType: "audio/wav",
       transcription: "Mo fẹ́ transfer owó.",
       transcriptionTagged: "Mo fẹ́ [[EN]]transfer[[/EN]] owó.",
-      cmiBand: "medium",
+      sourceCmiBand: "medium",
+      selectionCmiBucket: "medium",
       samplingRateHz: 16000,
     });
     expect(parsed).not.toHaveProperty("hyp_sahara_v2_5");

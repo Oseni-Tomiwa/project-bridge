@@ -4,7 +4,7 @@
 
 `Kimyayd/vocal-money-codeswitch-asr-benchmark` is Project Bridge's **secondary development benchmark**. It does not replace the official `intronhealth/AfriSwitch` Yoruba `test` split as the primary challenge benchmark. The public dataset is an AfriSwitch-derived Yoruba-English code-switched set published with 210 rows in the Hugging Face `default` configuration and `train` split.
 
-The source declares 16 kHz mono PCM16 WAV audio and three CMI bands: low (`<10`), medium (`10–25`), and high (`>25`), with 70 rows in each band. Preparation preserves each published reference transcript, tagged transcript, CMI, band, switch-point count, duration, device/noise fields, source dataset/file identifiers, and the resolved repository commit SHA.
+The source declares 16 kHz mono PCM16 WAV audio and publishes three CMI band labels with 70 rows each: `low`, `medium`, and `high`. Preparation preserves each label verbatim along with the numeric CMI, reference transcript, tagged transcript, switch-point count, duration, device/noise fields, source dataset/file identifiers, and resolved repository commit SHA. Project Bridge does not recompute or validate the source label: three live rows publish `low` at numeric CMI `10.0`.
 
 The source is marked `CC-BY-NC-SA-4.0`, which carries attribution, non-commercial, and ShareAlike conditions. The dataset card also states that speakers did not consent specifically to this derivative dataset and that source-corpus terms still apply. This repository records those notices but does not interpret whether a proposed use, provider upload, derived artifact, or publication complies with them. Product/legal approval remains required. Because the dataset is public, the integration does not read or send `HF_TOKEN`.
 
@@ -16,11 +16,12 @@ The v0.1 development configuration is:
 manifest: vocal-money-codeswitch-dev-v0.1
 sampleCount: 30
 seed: project-bridge-vocal-money-dev-v1
-selection: cmi-band-stratified-seeded-v1
-target distribution: 10 low / 10 medium / 10 high
+selection: project-bridge-cmi-threshold-bucket-stratified-seeded-v1
+selection buckets: low <10 / medium 10–25 inclusive / high >25
+target distribution: 10 per Project Bridge selection bucket
 ```
 
-Selection depends only on source metadata and the seed. It never uses provider performance. `--all` materializes all 210 rows in source-row order for a full-dataset experiment.
+Selection depends only on numeric CMI and the seed. Project Bridge derives a separate sampling-only `selectionCmiBucket`: low for CMI `<10`, medium for `10–25` inclusive, and high for `>25`. Live metadata currently contains 67/73/70 rows in those buckets, independently of the published 70/70/70 source-label distribution. The 30-row subset selects 10 from each Project Bridge bucket. It never uses provider performance. `--all` materializes all 210 rows in source-row order for a full-dataset experiment.
 
 ## Preparation
 

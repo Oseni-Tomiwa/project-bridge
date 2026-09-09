@@ -4,15 +4,20 @@ import {
   associateVocalMoneyAudio,
   createVocalMoneyFrozenManifest,
   mapVocalMoneyRow,
+  projectBridgeVocalMoneySelectionCmiBucket,
   selectVocalMoneyRows,
   validateVocalMoneySourceRows,
-  type VocalMoneyCmiBand,
+  type VocalMoneySelectionCmiBucket,
   type VocalMoneySourceRow,
 } from "../src/index.js";
 
 const revision = "a".repeat(40);
 
-function row(index: number, band: VocalMoneyCmiBand): VocalMoneySourceRow {
+function row(
+  index: number,
+  bucket: VocalMoneySelectionCmiBucket,
+): VocalMoneySourceRow {
+  const codeMixingIndex = bucket === "low" ? 5 : bucket === "medium" ? 20 : 40;
   return {
     rowIndex: index,
     audioUrl: `https://assets.example/${index}.wav?signature=secret`,
@@ -28,8 +33,10 @@ function row(index: number, band: VocalMoneyCmiBand): VocalMoneySourceRow {
     noiseConditions: "clean",
     durationSeconds: 4.25,
     samplingRateHz: 16_000,
-    codeMixingIndex: band === "low" ? 5 : band === "medium" ? 20 : 40,
-    cmiBand: band,
+    codeMixingIndex,
+    sourceCmiBand: bucket,
+    selectionCmiBucket:
+      projectBridgeVocalMoneySelectionCmiBucket(codeMixingIndex),
     numSwitchPoints: 2,
     transcription: "Mo fẹ́ transfer one thousand naira.",
     transcriptionTagged: "Mo fẹ́ [[EN]]transfer one thousand naira[[/EN]].",
@@ -80,9 +87,9 @@ describe("Vocal Money dataset contracts", () => {
     );
     expect(
       Object.fromEntries(
-        (["low", "medium", "high"] as const).map((band) => [
-          band,
-          first.filter((item) => item.cmiBand === band).length,
+        (["low", "medium", "high"] as const).map((bucket) => [
+          bucket,
+          first.filter((item) => item.selectionCmiBucket === bucket).length,
         ]),
       ),
     ).toEqual({ low: 10, medium: 10, high: 10 });
@@ -108,14 +115,26 @@ describe("Vocal Money dataset contracts", () => {
       expect.arrayContaining(["duplicate-clip-id", "invalid-sampling-rate"]),
     );
 
-    const materialized = associateVocalMoneyAudio(
-      mapVocalMoneyRow(row(1, "medium"), revision),
-      {
-        relativePath: "audio/vocal-money-as_001.wav",
-        contentSha256: "b".repeat(64),
-        byteLength: 128,
-      },
-    );
+    const publishedBoundaryRow = {
+      ...row(1, "medium"),
+      codeMixingIndex: 10,
+      sourceCmiBand: "low",
+      selectionCmiBucket: "medium" as const,
+    };
+    expect(validateVocalMoneySourceRows([publishedBoundaryRow])).toEqual([]);
+    const mapped = mapVocalMoneyRow(publishedBoundaryRow, revision);
+    expect(mapped).toMatchObject({
+      sourceCmiBand: "low",
+      selectionCmiBucket: "medium",
+      codeMixingIndex: 10,
+      downstream: null,
+    });
+
+    const materialized = associateVocalMoneyAudio(mapped, {
+      relativePath: "audio/vocal-money-as_001.wav",
+      contentSha256: "b".repeat(64),
+      byteLength: 128,
+    });
     expect(materialized).not.toHaveProperty("sourceAudioUrl");
     const manifest = createVocalMoneyFrozenManifest({
       revision,
@@ -130,7 +149,8 @@ describe("Vocal Money dataset contracts", () => {
     expect(manifest.selection).toMatchObject({
       publishedHypothesesUsed: false,
       providerPerformanceUsed: false,
-      cmiBandCounts: { low: 0, medium: 1, high: 0 },
+      sourceCmiBandCounts: { low: 1 },
+      selectionCmiBucketCounts: { low: 0, medium: 1, high: 0 },
     });
   });
 });

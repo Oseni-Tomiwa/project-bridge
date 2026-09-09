@@ -34,8 +34,10 @@ export const vocalMoneyCodeswitchDevPreparation = {
     algorithm: VOCAL_MONEY_SELECTION_ALGORITHM,
     sampleCount: VOCAL_MONEY_DEV_SAMPLE_COUNT,
     seed: VOCAL_MONEY_DEV_SEED,
-    cmiBands: ["low", "medium", "high"],
-    targetPerBand: 10,
+    sourceCmiBandHandling: "preserve-verbatim",
+    selectionCmiBuckets: ["low", "medium", "high"],
+    selectionThresholds: "low:<10;medium:10-through-25;high:>25",
+    targetPerSelectionBucket: 10,
     providerPerformanceUsed: false,
   },
   publishedHypotheses: {

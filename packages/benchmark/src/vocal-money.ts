@@ -14,9 +14,10 @@ export const VOCAL_MONEY_MANIFEST_ID = "vocal-money-codeswitch-dev-v0.1";
 export const VOCAL_MONEY_EXPECTED_SAMPLE_COUNT = 210;
 export const VOCAL_MONEY_DEV_SAMPLE_COUNT = 30;
 export const VOCAL_MONEY_DEV_SEED = "project-bridge-vocal-money-dev-v1";
-export const VOCAL_MONEY_SELECTION_ALGORITHM = "cmi-band-stratified-seeded-v1";
+export const VOCAL_MONEY_SELECTION_ALGORITHM =
+  "project-bridge-cmi-threshold-bucket-stratified-seeded-v1";
 
-export type VocalMoneyCmiBand = "low" | "medium" | "high";
+export type VocalMoneySelectionCmiBucket = "low" | "medium" | "high";
 
 export interface VocalMoneySourceRow {
   readonly rowIndex: number;
@@ -34,7 +35,10 @@ export interface VocalMoneySourceRow {
   readonly durationSeconds: number;
   readonly samplingRateHz: number;
   readonly codeMixingIndex: number;
-  readonly cmiBand: VocalMoneyCmiBand;
+  /** Exact source-published label; never recomputed or relabeled. */
+  readonly sourceCmiBand: string;
+  /** Project Bridge's independent numeric-CMI bucket for sampling only. */
+  readonly selectionCmiBucket: VocalMoneySelectionCmiBucket;
   readonly numSwitchPoints: number;
   readonly transcription: string;
   readonly transcriptionTagged: string;
@@ -70,7 +74,8 @@ export interface VocalMoneyMappedSample {
   readonly durationSeconds: number;
   readonly samplingRateHz: number;
   readonly codeMixingIndex: number;
-  readonly cmiBand: VocalMoneyCmiBand;
+  readonly sourceCmiBand: string;
+  readonly selectionCmiBucket: VocalMoneySelectionCmiBucket;
   readonly numSwitchPoints: number;
   readonly downstream: null;
 }
@@ -122,7 +127,10 @@ export interface VocalMoneyFrozenManifest {
     requestedSampleCount: number;
     actualSampleCount: number;
     strata: readonly ["low", "medium", "high"];
-    cmiBandCounts: Readonly<Record<VocalMoneyCmiBand, number>>;
+    sourceCmiBandCounts: Readonly<Record<string, number>>;
+    selectionCmiBucketCounts: Readonly<
+      Record<VocalMoneySelectionCmiBucket, number>
+    >;
     providerPerformanceUsed: false;
     publishedHypothesesUsed: false;
   }>;
@@ -208,7 +216,8 @@ export function mapVocalMoneyRow(
     durationSeconds: row.durationSeconds,
     samplingRateHz: row.samplingRateHz,
     codeMixingIndex: row.codeMixingIndex,
-    cmiBand: row.cmiBand,
+    sourceCmiBand: row.sourceCmiBand,
+    selectionCmiBucket: row.selectionCmiBucket,
     numSwitchPoints: row.numSwitchPoints,
     downstream: null,
   };
@@ -272,8 +281,19 @@ export function validateVocalMoneySourceRows(
       row.codeMixingIndex > 100
     )
       add("invalid-cmi", "code_mixing_index must be between 0 and 100.");
-    if (!cmiMatchesBand(row.codeMixingIndex, row.cmiBand))
-      add("cmi-band-mismatch", "cmi_band does not match code_mixing_index.");
+    if (row.sourceCmiBand.trim() === "")
+      add("missing-source-cmi-band", "Published cmi_band is required.");
+    if (
+      Number.isFinite(row.codeMixingIndex) &&
+      row.codeMixingIndex >= 0 &&
+      row.codeMixingIndex <= 100 &&
+      row.selectionCmiBucket !==
+        projectBridgeVocalMoneySelectionCmiBucket(row.codeMixingIndex)
+    )
+      add(
+        "selection-cmi-bucket-mismatch",
+        "Selection CMI bucket must match the Project Bridge numeric-CMI policy.",
+      );
     if (!Number.isSafeInteger(row.numSwitchPoints) || row.numSwitchPoints < 0)
       add("invalid-switch-points", "num_switch_points must be non-negative.");
   }
@@ -303,9 +323,9 @@ export function selectVocalMoneyRows(
   }
   if (configuration.seed.trim() === "")
     throw new Error("A non-empty deterministic seed is required.");
-  const groups = (["low", "medium", "high"] as const).map((band) =>
+  const groups = (["low", "medium", "high"] as const).map((bucket) =>
     rows
-      .filter((row) => row.cmiBand === band)
+      .filter((row) => row.selectionCmiBucket === bucket)
       .sort((left, right) =>
         compareRankedRows(left, right, configuration.seed),
       ),
@@ -356,7 +376,8 @@ export function associateVocalMoneyAudio(
     durationSeconds: sample.durationSeconds,
     samplingRateHz: sample.samplingRateHz,
     codeMixingIndex: sample.codeMixingIndex,
-    cmiBand: sample.cmiBand,
+    sourceCmiBand: sample.sourceCmiBand,
+    selectionCmiBucket: sample.selectionCmiBucket,
     numSwitchPoints: sample.numSwitchPoints,
     downstream: sample.downstream,
     audio: {
@@ -378,7 +399,8 @@ export function createVocalMoneyFrozenManifest(
     samples: readonly VocalMoneyMaterializedSample[];
   }>,
 ): VocalMoneyFrozenManifest {
-  const counts = countCmiBands(input.samples);
+  const sourceCmiBandCounts = countSourceCmiBands(input.samples);
+  const selectionCmiBucketCounts = countSelectionCmiBuckets(input.samples);
   const manifest: VocalMoneyFrozenManifest = {
     id: VOCAL_MONEY_MANIFEST_ID,
     version: "0.1",
@@ -403,7 +425,8 @@ export function createVocalMoneyFrozenManifest(
       requestedSampleCount: input.selection.requestedSampleCount,
       actualSampleCount: input.samples.length,
       strata: ["low", "medium", "high"],
-      cmiBandCounts: counts,
+      sourceCmiBandCounts,
+      selectionCmiBucketCounts,
       providerPerformanceUsed: false,
       publishedHypothesesUsed: false,
     },
@@ -465,25 +488,49 @@ export function validateVocalMoneyManifest(
         `Sample ${sample.id} contains a published provider hypothesis.`,
       );
   }
-  const actualCounts = countCmiBands(manifest.samples);
-  for (const band of ["low", "medium", "high"] as const)
-    if (actualCounts[band] !== manifest.selection.cmiBandCounts[band])
-      issues.push(`CMI band count mismatch for ${band}.`);
+  const actualSourceCounts = countSourceCmiBands(manifest.samples);
+  if (
+    JSON.stringify(actualSourceCounts) !==
+    JSON.stringify(manifest.selection.sourceCmiBandCounts)
+  )
+    issues.push("Published source CMI band counts do not match the samples.");
+  const actualSelectionCounts = countSelectionCmiBuckets(manifest.samples);
+  for (const bucket of ["low", "medium", "high"] as const)
+    if (
+      actualSelectionCounts[bucket] !==
+      manifest.selection.selectionCmiBucketCounts[bucket]
+    )
+      issues.push(`Selection CMI bucket count mismatch for ${bucket}.`);
   return issues;
 }
 
-function countCmiBands(
-  samples: readonly Pick<VocalMoneyMaterializedSample, "cmiBand">[],
-): Record<VocalMoneyCmiBand, number> {
+function countSourceCmiBands(
+  samples: readonly Pick<VocalMoneyMaterializedSample, "sourceCmiBand">[],
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const sample of samples)
+    counts[sample.sourceCmiBand] = (counts[sample.sourceCmiBand] ?? 0) + 1;
+  return Object.fromEntries(
+    Object.entries(counts).sort(([left], [right]) => left.localeCompare(right)),
+  );
+}
+
+function countSelectionCmiBuckets(
+  samples: readonly Pick<VocalMoneyMaterializedSample, "selectionCmiBucket">[],
+): Record<VocalMoneySelectionCmiBucket, number> {
   const counts = { low: 0, medium: 0, high: 0 };
-  for (const sample of samples) counts[sample.cmiBand] += 1;
+  for (const sample of samples) counts[sample.selectionCmiBucket] += 1;
   return counts;
 }
 
-function cmiMatchesBand(cmi: number, band: VocalMoneyCmiBand): boolean {
-  if (band === "low") return cmi < 10;
-  if (band === "medium") return cmi >= 10 && cmi <= 25;
-  return cmi > 25;
+export function projectBridgeVocalMoneySelectionCmiBucket(
+  cmi: number,
+): VocalMoneySelectionCmiBucket {
+  if (!Number.isFinite(cmi) || cmi < 0 || cmi > 100)
+    throw new Error("CMI must be between 0 and 100 for selection bucketing.");
+  if (cmi < 10) return "low";
+  if (cmi <= 25) return "medium";
+  return "high";
 }
 
 function compareRankedRows(

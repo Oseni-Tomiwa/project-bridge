@@ -11,6 +11,7 @@ import {
   associateVocalMoneyAudio,
   createVocalMoneyFrozenManifest,
   mapVocalMoneyRow,
+  projectBridgeVocalMoneySelectionCmiBucket,
   selectVocalMoneyRows,
   validateVocalMoneySourceRows,
 } from "@project-bridge/benchmark";
@@ -288,10 +289,12 @@ export function parseViewerRow(value) {
     invalidFields.push("num_switch_points");
   }
   if (
-    typeof row.cmi_band === "string" &&
-    !["low", "medium", "high"].includes(row.cmi_band)
+    typeof row.code_mixing_index === "number" &&
+    (!Number.isFinite(row.code_mixing_index) ||
+      row.code_mixing_index < 0 ||
+      row.code_mixing_index > 100)
   ) {
-    invalidFields.push("cmi_band");
+    invalidFields.push("code_mixing_index");
   }
   const unexpectedFields = Object.keys(row).filter(
     (field) => !knownFields.has(field) && !field.startsWith("hyp_"),
@@ -339,7 +342,10 @@ export function parseViewerRow(value) {
     durationSeconds: row.duration_s,
     samplingRateHz: row.sampling_rate,
     codeMixingIndex: row.code_mixing_index,
-    cmiBand: row.cmi_band,
+    sourceCmiBand: row.cmi_band,
+    selectionCmiBucket: projectBridgeVocalMoneySelectionCmiBucket(
+      row.code_mixing_index,
+    ),
     numSwitchPoints: row.num_switch_points,
     transcription: row.transcription,
     transcriptionTagged: row.transcription_tagged,
@@ -356,9 +362,12 @@ async function main() {
   console.log(`revision: ${manifest.source.revision}`);
   console.log(`requested_samples: ${manifest.selection.requestedSampleCount}`);
   console.log(`actual_samples: ${manifest.samples.length}`);
-  console.log(`cmi_low: ${manifest.selection.cmiBandCounts.low}`);
-  console.log(`cmi_medium: ${manifest.selection.cmiBandCounts.medium}`);
-  console.log(`cmi_high: ${manifest.selection.cmiBandCounts.high}`);
+  console.log(
+    `source_cmi_band_counts: ${JSON.stringify(manifest.selection.sourceCmiBandCounts)}`,
+  );
+  console.log(
+    `selection_cmi_bucket_counts: ${JSON.stringify(manifest.selection.selectionCmiBucketCounts)}`,
+  );
   console.log(
     `total_duration_seconds: ${manifest.samples
       .reduce((total, sample) => total + sample.durationSeconds, 0)
