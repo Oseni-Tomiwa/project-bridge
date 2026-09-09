@@ -37,7 +37,11 @@ When confidence is insufficient, ask a neutral clarification or decline safely. 
 
 High-risk verticals need domain-specific review, escalation paths, and regulatory analysis before real-world use. A challenge demo should use sandboxed or simulated downstream systems unless real execution has been explicitly approved and made safe.
 
-The current financial-support slice only creates a process-local simulated case after explicit confirmation. It does not authenticate users, inspect accounts, contact a bank, or move money. The API rejects obvious credential and long card/account-number patterns before adding an utterance to conversation state. This narrow pattern check is defense in depth for a demo, not reliable data-loss prevention; the UI also tells users not to submit these values. Logs, reverse proxies, browsers, and future integrations require their own controls before real user data is accepted.
+The current financial-support slice only creates a process-local simulated case after explicit confirmation. It does not authenticate users, inspect accounts, contact a bank, or move money. Microphone permission is requested only after the user activates recording. The UI warns against speaking credentials before recording, exposes the raw transcript for review, and requires Continue before the transcript becomes an utterance. Text remains available if voice is unsupported or permission is denied.
+
+Project Bridge holds product-flow audio only in browser memory and API/provider request scope; v0.1 does not persist it. Intron receives the audio for transcription, so this is not a claim that no third party processes or retains it. Provider terms, account settings, notice, lawful basis, and retention/deletion behavior require review before real-user use.
+
+The API rejects obvious credential and long card/account-number patterns before adding the user-approved transcript or typed text to conversation state. This server-side check remains authoritative, but it occurs after voice transcription and therefore cannot prevent a spoken credential from reaching the speech provider. The pattern check is defense in depth for a demo, not reliable data-loss prevention. Logs, reverse proxies, browsers, and future integrations require their own controls before real user data is accepted.
 
 ## Fairness and evaluation
 

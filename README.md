@@ -4,7 +4,7 @@
 
 Project Bridge explores a voice-first AI access layer through which a person can speak naturally, be understood across code-switched speech, clarify missing information, confirm consequential actions, trigger a downstream task, and receive an accessible response.
 
-The first vertical slice is a simulated failed/pending-transfer support journey. It uses deterministic text rules, asks for missing information, presents a summary for explicit confirmation, and creates an in-memory support case. It does **not** connect to a bank or perform a banking action. Opt-in Intron/Sahara, OpenAI, and Deepgram file-transcription adapters are implemented, but none is wired into the web/API journey and no comparative benchmark has been run. An LLM, durable storage, authentication, and TTS are not implemented.
+The first vertical slice is a simulated failed/pending-transfer support journey. It records an explicitly initiated browser voice message, sends it through the API to Intron/Sahara, shows an editable transcript, then uses deterministic text rules to clarify missing information, request explicit confirmation, and create an in-memory support case. Text entry remains available. It does **not** connect to a bank or perform a banking action. OpenAI and Deepgram remain benchmark providers rather than product-flow fallbacks, and no comparative benchmark has been run. An LLM, durable storage, authentication, and TTS are not implemented.
 
 ## Decision labels
 
@@ -19,8 +19,8 @@ Documentation uses these labels consistently:
 
 ```text
 apps/
-  web/           Accessible text-based financial-support demo
-  api/           Conversation and simulated support-case HTTP API
+  web/           Accessible voice-first financial-support demo with text fallback
+  api/           Server-side STT, conversation, and simulated support-case API
 packages/
   speech/        Provider-neutral speech contracts and file-STT adapters
   conversation/  Conversation and interpretation contracts
@@ -55,7 +55,7 @@ pnpm check
 
 The web shell defaults to `http://localhost:5173`; the API defaults to `http://127.0.0.1:3000`. Copy `.env.example` to `.env` only when local overrides are needed.
 
-Start both applications with `pnpm dev`, then type a representative failed-transfer report. The prototype recognizes a deliberately small set of English, Nigerian Pidgin, and English/Yoruba code-switch phrases. Do not enter real financial or authentication data.
+To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and start both applications with `pnpm dev`. Open `http://localhost:5173`, activate the microphone button, stop recording, review or correct the visible transcript, and continue. The API reads the root `.env` in local development; the key is never exposed through Vite or sent to the browser. Text entry remains available. The prototype recognizes a deliberately small set of English, Nigerian Pidgin, and English/Yoruba code-switch phrases. Do not speak or type real financial or authentication data.
 
 ## Documentation
 
@@ -63,6 +63,7 @@ Start both applications with `pnpm dev`, then type a representative failed-trans
 - [Challenge requirements](docs/challenge-requirements.md)
 - [MVP boundaries](docs/mvp-boundaries.md)
 - [Architecture](docs/architecture.md)
+- [Voice-first product flow](docs/voice-product-flow.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
 - [Batch STT benchmark runner](docs/stt-batch-runner.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)

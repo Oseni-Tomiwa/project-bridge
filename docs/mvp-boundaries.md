@@ -6,7 +6,10 @@
 
 ### Implemented in the first vertical slice
 
-- Text entry representing a natural utterance.
+- Explicit-gesture browser microphone capture with visible recording state, Stop/Cancel controls, elapsed time, and a one-minute/8 MiB bound.
+- Server-side Intron/Sahara transcription with request-scoped audio and no Project Bridge audio persistence.
+- Visible raw transcript, intentional user correction, and explicit Continue before conversation submission.
+- Text entry as an accessible fallback converging on the same canonical utterance endpoint.
 - Deterministic recognition of representative failed/pending-transfer phrases.
 - Required-field collection, one simple follow-up at a time, and concise summary generation.
 - Explicit confirmation bound to the exact proposal and conversation revision.
@@ -15,11 +18,10 @@
 
 ### Planned but not implemented
 
-- Capture or upload consented speech for selected language pairs.
 - Run the same audio through three speech providers.
 - Normalize and compare transcripts with reproducible configuration.
 - Replace deterministic interpretation only after an evaluated provider-neutral approach is selected.
-- Communicate completion or failure in plain language; include voice output if selected for the demo.
+- Add spoken output; completion and failure are currently communicated visually in plain language.
 - Record privacy-conscious operational and evaluation telemetry.
 
 ### Out of scope for the initial challenge MVP
@@ -35,4 +37,4 @@
 
 ## Current gate
 
-The simulated workflow may be demonstrated with invented data. Collection of real participant audio and connection to any external speech or financial provider remain gated on the unresolved data, consent, security, evaluation, and regulatory decisions.
+The simulated workflow may be demonstrated with invented spoken or typed data through the configured Intron service. It is not approved for real customer data or participant research. Any such use remains gated on unresolved notice, consent/lawful-basis, provider-processing, retention, security, evaluation, and regulatory decisions.

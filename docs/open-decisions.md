@@ -7,7 +7,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Final product/brand name
 - Target user segment within financial-service support and accessibility research plan
 - Initial countries, language pairs, code-switch patterns, and accessibility needs
-- Voice-only versus voice-first channel experience
+- Voice-first usability findings and whether any later experience should be voice-only
 - Success criteria for user value and task completion
 
 ## Models and providers
@@ -26,6 +26,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Post-prototype interpretation approach (the current demo uses narrow deterministic rules)
 - Text-to-speech requirement and provider
 - Model fallback and confidence/calibration policy
+- Product STT fallback policy if Intron is unavailable; v0.1 does not switch providers automatically
 
 ## Data and evaluation
 
@@ -58,6 +59,7 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Whether support-case persistence is required beyond the current process-local in-memory repository; if so, database and retention design
 - Observability, cost controls, queueing, and provider failover
 - API/channel protocol and streaming requirements
+- Browser/container compatibility targets and whether one shared, versioned transcoding path is required
 
 ## Responsible AI and governance
 

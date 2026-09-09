@@ -89,6 +89,14 @@ h2 {
   text-transform: uppercase;
 }
 
+h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
 .history {
   display: grid;
   gap: 0.8rem;
@@ -139,6 +147,132 @@ form {
   gap: 0.75rem;
 }
 
+.voice-panel {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: clamp(1.25rem, 5vw, 2.5rem);
+  border: 2px solid #b8c7bc;
+  border-radius: 1rem;
+  background: #f7faf7;
+  text-align: center;
+}
+
+.voice-warning {
+  max-width: 35rem;
+  margin: 0;
+  color: #4d574f;
+  line-height: 1.55;
+}
+
+.record-button {
+  display: grid;
+  width: 9rem;
+  min-height: 9rem;
+  place-items: center;
+  align-content: center;
+  gap: 0.55rem;
+  border-radius: 50%;
+  box-shadow: 0 0.7rem 1.8rem #17452f2e;
+}
+
+.record-button svg {
+  fill: currentColor;
+}
+
+.voice-state {
+  min-height: 1.5rem;
+  margin: 0;
+  color: #435248;
+  font-weight: 650;
+}
+
+.recording-controls {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #a01f17;
+  border-radius: 0.8rem;
+  background: #fff3f0;
+}
+
+.recording-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0;
+  color: #811b15;
+  font-weight: 800;
+}
+
+.recording-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid #811b15;
+  border-radius: 50%;
+  background: #d63b30;
+  animation: recording-pulse 1.2s ease-in-out infinite;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.secondary-button {
+  color: #17452f;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #17452f;
+}
+
+.secondary-button:hover {
+  color: #fff;
+}
+
+.transcript-panel {
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: 2px solid #17452f;
+  border-radius: 0.8rem;
+  background: #f0f7f2;
+}
+
+.transcript-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+blockquote {
+  margin: 0;
+  padding: 1rem;
+  border-left: 4px solid #d29a42;
+  background: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.text-fallback {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #cbd3cd;
+  border-radius: 0.8rem;
+}
+
+.text-fallback summary {
+  min-height: 2.75rem;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.text-fallback form {
+  padding-top: 1rem;
+}
+
 label {
   font-weight: 750;
 }
@@ -181,6 +315,13 @@ button:hover {
 button:disabled {
   cursor: wait;
   opacity: 0.55;
+}
+
+@keyframes recording-pulse {
+  50% {
+    transform: scale(0.75);
+    opacity: 0.55;
+  }
 }
 
 .confirmation {
@@ -237,5 +378,9 @@ button:disabled {
   * {
     scroll-behavior: auto !important;
     transition: none !important;
+  }
+
+  .recording-dot {
+    animation: none;
   }
 }

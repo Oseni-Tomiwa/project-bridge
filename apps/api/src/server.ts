@@ -11,6 +11,13 @@ import {
   FinancialSupportService,
   InMemorySupportCaseRepository,
 } from "@project-bridge/domain";
+import type { SpeechProvider } from "@project-bridge/speech";
+import {
+  PRODUCT_AUDIO_MAX_BYTES,
+  ProductSpeechError,
+  createDefaultProductSpeechProvider,
+  transcribeProductAudio,
+} from "./speech-transcription.js";
 
 export function createDefaultFinancialSupportService(): FinancialSupportService {
   return new FinancialSupportService({
@@ -26,9 +33,12 @@ export function createDefaultFinancialSupportService(): FinancialSupportService 
 
 export function createApiServer(
   service: FinancialSupportService = createDefaultFinancialSupportService(),
+  speechProvider:
+    | SpeechProvider
+    | undefined = createDefaultProductSpeechProvider(),
 ) {
   return createServer((request, response) => {
-    void route(request, response, service);
+    void route(request, response, service, speechProvider);
   });
 }
 
@@ -36,9 +46,13 @@ async function route(
   request: IncomingMessage,
   response: ServerResponse,
   service: FinancialSupportService,
+  speechProvider: SpeechProvider | undefined,
 ): Promise<void> {
   response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, X-Audio-Duration-Ms",
+  );
   response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   response.setHeader("Content-Type", "application/json; charset=utf-8");
 
@@ -49,6 +63,14 @@ async function route(
 
   const url = new URL(request.url ?? "/", "http://localhost");
   try {
+    if (
+      request.method === "POST" &&
+      url.pathname === "/speech/transcriptions"
+    ) {
+      const upload = await readAudioUpload(request);
+      send(response, 200, await transcribeProductAudio(speechProvider, upload));
+      return;
+    }
     const body = request.method === "POST" ? await readJson(request) : {};
     const result = await dispatchApiRequest(
       service,
@@ -88,9 +110,10 @@ export async function dispatchApiRequest(
           "deterministic failed-transfer interpretation",
           "clarification and explicit confirmation",
           "simulated in-memory support cases",
+          "request-scoped Intron/Sahara voice transcription",
         ],
         notImplemented: [
-          "speech integrations",
+          "text-to-speech",
           "real financial-service integrations",
           "authentication",
           "durable persistence",
@@ -159,6 +182,12 @@ export async function dispatchApiRequest(
 }
 
 export function apiErrorResponse(error: unknown): ApiDispatchResult {
+  if (error instanceof ProductSpeechError) {
+    return {
+      status: error.status,
+      body: { error: { code: error.code, message: error.message } },
+    };
+  }
   if (error instanceof FinancialSupportError) {
     return {
       status: error.status,
@@ -173,6 +202,55 @@ export function apiErrorResponse(error: unknown): ApiDispatchResult {
         message: "An unexpected error occurred.",
       },
     },
+  };
+}
+
+async function readAudioUpload(request: IncomingMessage): Promise<{
+  readonly bytes: Uint8Array;
+  readonly mediaType: string;
+  readonly durationMilliseconds?: number;
+}> {
+  const chunks: Buffer[] = [];
+  let byteLength = 0;
+  let tooLarge = false;
+  for await (const chunk of request) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    byteLength += buffer.byteLength;
+    if (byteLength > PRODUCT_AUDIO_MAX_BYTES) {
+      tooLarge = true;
+    } else {
+      chunks.push(buffer);
+    }
+  }
+  if (tooLarge) {
+    throw new ProductSpeechError(
+      "audio-too-large",
+      "The recording is too large. Record a shorter message or type it instead.",
+      413,
+    );
+  }
+
+  const durationHeader = request.headers["x-audio-duration-ms"];
+  const durationText = Array.isArray(durationHeader)
+    ? durationHeader[0]
+    : durationHeader;
+  const durationMilliseconds =
+    durationText === undefined ? undefined : Number(durationText);
+  if (
+    durationMilliseconds !== undefined &&
+    (!Number.isFinite(durationMilliseconds) || durationMilliseconds < 0)
+  ) {
+    throw new ProductSpeechError(
+      "invalid-audio-duration",
+      "The audio duration header must be a non-negative number.",
+      400,
+    );
+  }
+
+  return {
+    bytes: new Uint8Array(Buffer.concat(chunks)),
+    mediaType: request.headers["content-type"] ?? "",
+    ...(durationMilliseconds === undefined ? {} : { durationMilliseconds }),
   };
 }
 

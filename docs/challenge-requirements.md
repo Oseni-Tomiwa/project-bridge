@@ -19,11 +19,12 @@
 | --------------------------- | ---------------------------------- |
 | Provider-neutral repository | Foundation created                 |
 | Specific vertical           | Financial-service support selected |
-| Sahara integration          | Prerecorded adapter implemented    |
+| Sahara integration          | Default product STT via API        |
 | Competitor integrations     | OpenAI and Deepgram adapters added |
 | Speech dataset              | Not collected                      |
 | Benchmark execution         | Contracts only; no results         |
 | Downstream action           | Simulated support-case creation    |
+| Voice input                 | Browser recording and review added |
 | Voice response              | Not implemented                    |
 | Responsible AI plan         | Initial documentation only         |
 

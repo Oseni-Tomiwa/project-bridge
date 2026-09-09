@@ -16,8 +16,9 @@
         <p class="eyebrow">Temporary codename · Challenge prototype</p>
         <h1>Transfer support, in your own words.</h1>
         <p class="lede">
-          Type naturally in English, Nigerian Pidgin, or simple English/Yoruba
-          code-switching. Voice input is planned but is not available yet.
+          Speak naturally in English, Nigerian Pidgin, or English/Yoruba
+          code-switching. You will see and can correct the transcript before it
+          enters the support conversation.
         </p>
       </header>
 
@@ -31,21 +32,99 @@
       <section class="conversation" aria-labelledby="conversation-heading">
         <h2 id="conversation-heading">Conversation</h2>
         <ol id="history" class="history" aria-live="polite"></ol>
-        <form id="utterance-form">
-          <label for="utterance">What happened with your transfer?</label>
-          <textarea
-            id="utterance"
-            name="utterance"
-            rows="4"
-            placeholder="Example: I sent 25k yesterday, owo ti kuro but the person never receive am."
-            aria-describedby="utterance-help"
-            required
-          ></textarea>
-          <p id="utterance-help" class="small">
-            Do not include account or authentication details.
-          </p>
-          <button id="send" type="submit">Send</button>
-        </form>
+        <div id="interaction">
+          <section
+            id="voice-panel"
+            class="voice-panel"
+            aria-labelledby="voice-heading"
+          >
+            <h3 id="voice-heading">Tell us what happened</h3>
+            <p class="voice-warning">
+              Before recording, make sure you do not speak a PIN, OTP, password,
+              CVV, full card number, or full account number.
+            </p>
+            <button
+              id="record"
+              class="record-button"
+              type="button"
+              aria-label="Start recording your transfer issue"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                width="32"
+                height="32"
+              >
+                <path
+                  d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm-7-3a1 1 0 0 1 2 0 5 5 0 0 0 10 0 1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V20h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 5 11Z"
+                />
+              </svg>
+              <span>Start recording</span>
+            </button>
+            <p
+              id="voice-state"
+              class="voice-state"
+              role="status"
+              aria-live="polite"
+            >
+              Microphone access is requested only when you start recording.
+            </p>
+            <div id="recording-controls" class="recording-controls" hidden>
+              <p class="recording-indicator">
+                <span class="recording-dot" aria-hidden="true"></span>
+                Recording <time id="recording-time">0:00</time>
+              </p>
+              <div class="button-row">
+                <button id="stop-recording" type="button">
+                  Stop recording
+                </button>
+                <button
+                  id="cancel-recording"
+                  class="secondary-button"
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <form id="transcript-form" class="transcript-panel" hidden>
+            <p class="transcript-label">We heard:</p>
+            <blockquote id="raw-transcript"></blockquote>
+            <label for="transcript">Check or correct the transcript</label>
+            <textarea id="transcript" rows="4" required></textarea>
+            <p class="small">
+              Your edited text—not the original recording—continues into the
+              support flow.
+            </p>
+            <div class="button-row">
+              <button id="continue-transcript" type="submit">Continue</button>
+              <button id="record-again" class="secondary-button" type="button">
+                Record again
+              </button>
+            </div>
+          </form>
+
+          <details id="text-fallback" class="text-fallback">
+            <summary>Prefer to type instead?</summary>
+            <form id="utterance-form">
+              <label for="utterance">What happened with your transfer?</label>
+              <textarea
+                id="utterance"
+                name="utterance"
+                rows="4"
+                placeholder="Example: I sent 25k yesterday, owo ti kuro but the person never receive am."
+                aria-describedby="utterance-help"
+                required
+              ></textarea>
+              <p id="utterance-help" class="small">
+                Do not include account or authentication details.
+              </p>
+              <button id="send" type="submit">Send typed message</button>
+            </form>
+          </details>
+        </div>
         <div id="confirmation" class="confirmation" hidden>
           <p id="proposal-summary"></p>
           <button id="confirm" type="button">Yes, create support case</button>

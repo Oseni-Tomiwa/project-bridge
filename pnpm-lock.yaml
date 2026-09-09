@@ -41,6 +41,9 @@ importers:
       '@project-bridge/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@project-bridge/speech':
+        specifier: workspace:*
+        version: link:../../packages/speech
 
   apps/web: {}
 

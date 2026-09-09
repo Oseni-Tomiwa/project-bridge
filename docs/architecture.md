@@ -2,17 +2,21 @@
 
 ## Status
 
-This document describes the implemented text-based financial-support slice, provider-neutral boundaries, and opt-in Intron/Sahara, OpenAI, and Deepgram prerecorded STT adapters. The adapters are not wired into the application flow and no benchmark has been run.
+This document describes the implemented voice-first financial-support slice and provider-neutral boundaries. Intron/Sahara is wired into the product flow through the API; OpenAI and Deepgram remain evaluation adapters. No comparative benchmark has been run.
 
 ## Shape
 
 ```text
-web or other channel
+browser voice capture --raw audio--> API --server credential--> Intron/Sahara
+        |                              |
+        |                         TranscriptionResult
+        |                              |
+        +<---- visible/editable transcript
+        |
+web typed text or user-approved transcript
         |
         v
-API / orchestration boundary
-        |
-        +--> speech provider adapter(s) --> TranscriptionResult
+canonical conversation utterance API
         |
         +--> conversation interpreter --> intent + entities + missing fields
         |                                  |
@@ -31,6 +35,7 @@ evaluation runner --> identical sample --> provider adapters --> metrics/results
 - Keep applications deployable together initially; package boundaries are not microservice boundaries.
 - Depend on contracts rather than provider SDKs in core flows.
 - Identify a speech provider by configuration and inject its adapter.
+- Use Intron/Sahara as the configurable v0.1 product provider without browser-held credentials or runtime benchmark selection.
 - Keep each provider's HTTP, authentication, payload, query, and response details inside its speech adapter.
 - Pass the same immutable evaluation sample to each selected provider.
 - Keep conversation interpretation separate from transcription and action execution. The interpreter accepts a channel-neutral `UserUtterance`, so text fallback and reference-transcript evaluation do not depend on a speech-provider result.
@@ -65,14 +70,17 @@ The source definitions in `packages/*/src` are the canonical executable contract
 
 ## Implemented request flow
 
-1. The web client starts an in-memory conversation and submits text.
-2. Deterministic domain rules derive the `failed_transfer` intent and known fields.
-3. The service asks for each missing required field or creates a proposal and summary.
-4. The client submits explicit confirmation containing the proposal ID and revision.
-5. Generic action validation rejects mismatched confirmation before execution.
-6. The financial-support executor creates one simulated case through `SupportCaseRepository` and returns its reference.
+1. An explicit browser gesture requests microphone access and starts a bounded `MediaRecorder` capture.
+2. The browser sends the original audio bytes to `POST /speech/transcriptions`; the API validates and passes request-scoped bytes to the injected Intron/Sahara adapter.
+3. The browser displays the exact transcript and requires an explicit Continue action after optional correction.
+4. The approved transcript and typed fallback both submit to the same `/conversations/:id/utterances` boundary.
+5. Deterministic domain rules derive the `failed_transfer` intent and known fields.
+6. The service asks for each missing required field or creates a proposal and summary.
+7. The client submits explicit confirmation containing the proposal ID and revision.
+8. Generic action validation rejects mismatched confirmation before execution.
+9. The financial-support executor creates one simulated case through `SupportCaseRepository` and returns its reference.
 
-Later voice input ends at the existing channel-neutral `UserUtterance` boundary. All three implemented file-transcription adapters stop at the same `TranscriptionResult`; none changes the financial workflow or couples it to a speech vendor. Deepgram-specific request and response shapes remain inside `packages/speech`.
+Audio exists only in browser and API/provider request scope; it is not written to Project Bridge storage. Product orchestration depends only on `SpeechProvider`, and no provider-specific type crosses into conversation/domain packages. The benchmark runner remains a separate entry point.
 
 ## Failure and safety posture
 
@@ -86,7 +94,7 @@ Later voice input ends at the existing channel-neutral `UserUtterance` boundary.
 
 ## Open technical decisions
 
-Sahara model/version selection, OpenAI alias/version and language-hint policy, Deepgram version/language experiment policy, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
+Sahara model/version identity, browser-format coverage, product-provider fallback policy, OpenAI alias/version and language-hint policy, Deepgram version/language experiment policy, post-prototype interpretation/LLM approach, deployment platform, persistence, authentication, observability, text-to-speech, and detailed confidence calibration are unresolved.
 
 ## TypeScript build strategy
 
