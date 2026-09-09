@@ -17,7 +17,7 @@ import {
   ProductSpeechError,
   createDefaultProductSpeechProvider,
   transcribeProductAudio,
-} from "./speech-transcription.js";
+} from "./speech-transcription.ts";
 
 export function createDefaultFinancialSupportService(): FinancialSupportService {
   return new FinancialSupportService({
