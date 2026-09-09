@@ -194,13 +194,32 @@ export async function fetchSourceRows(fetchPage = fetchVocalMoneyRowsPage) {
 }
 
 export function parseViewerRow(value) {
+  const rowIndex =
+    isRecord(value) && Number.isSafeInteger(value.row_idx)
+      ? value.row_idx
+      : "<unknown>";
+  if (!isRecord(value)) {
+    throw new Error(
+      "Vocal Money schema mismatch at row <unknown>; unexpected required field shapes: row wrapper.",
+    );
+  }
+  if (!Number.isSafeInteger(value.row_idx)) {
+    throw new Error(
+      "Vocal Money schema mismatch at row <unknown>; unexpected required field shapes: row_idx.",
+    );
+  }
+  if (!isRecord(value.row)) {
+    throw new Error(
+      `Vocal Money schema mismatch at row ${rowIndex}; unexpected required field shapes: row.`,
+    );
+  }
   if (
-    !isRecord(value) ||
-    !Number.isSafeInteger(value.row_idx) ||
-    !isRecord(value.row) ||
-    (Array.isArray(value.truncated_cells) && value.truncated_cells.length > 0)
+    Array.isArray(value.truncated_cells) &&
+    value.truncated_cells.length > 0
   ) {
-    throw new Error("Unexpected or truncated Hugging Face dataset row.");
+    throw new Error(
+      `Vocal Money schema mismatch at row ${rowIndex}; truncated required fields: ${value.truncated_cells.join(", ")}.`,
+    );
   }
   const row = value.row;
   const audio = row.audio;
@@ -218,23 +237,96 @@ export function parseViewerRow(value) {
     "transcription",
     "transcription_tagged",
   ];
+  const requiredNumbers = [
+    "duration_s",
+    "sampling_rate",
+    "code_mixing_index",
+    "num_switch_points",
+  ];
+  const knownFields = new Set([
+    "audio",
+    ...requiredStrings,
+    ...requiredNumbers,
+  ]);
+  const missingFields = [...knownFields].filter(
+    (field) => !Object.hasOwn(row, field) || row[field] === null,
+  );
+  const invalidFields = [];
   if (
-    !isRecord(audio) ||
-    typeof audio.src !== "string" ||
-    requiredStrings.some((field) => typeof row[field] !== "string") ||
-    typeof row.duration_s !== "number" ||
-    !Number.isSafeInteger(row.sampling_rate) ||
-    typeof row.code_mixing_index !== "number" ||
-    !Number.isSafeInteger(row.num_switch_points) ||
+    !Array.isArray(audio) ||
+    audio.length !== 1 ||
+    !isRecord(audio[0]) ||
+    typeof audio[0].src !== "string" ||
+    typeof audio[0].type !== "string"
+  ) {
+    invalidFields.push("audio");
+  }
+  invalidFields.push(
+    ...requiredStrings.filter(
+      (field) =>
+        Object.hasOwn(row, field) &&
+        row[field] !== null &&
+        typeof row[field] !== "string",
+    ),
+    ...requiredNumbers.filter(
+      (field) =>
+        Object.hasOwn(row, field) &&
+        row[field] !== null &&
+        typeof row[field] !== "number",
+    ),
+  );
+  if (
+    typeof row.sampling_rate === "number" &&
+    !Number.isSafeInteger(row.sampling_rate)
+  ) {
+    invalidFields.push("sampling_rate");
+  }
+  if (
+    typeof row.num_switch_points === "number" &&
+    !Number.isSafeInteger(row.num_switch_points)
+  ) {
+    invalidFields.push("num_switch_points");
+  }
+  if (
+    typeof row.cmi_band === "string" &&
     !["low", "medium", "high"].includes(row.cmi_band)
   ) {
-    throw new Error(`Unexpected Vocal Money schema at row ${value.row_idx}.`);
+    invalidFields.push("cmi_band");
   }
+  const unexpectedFields = Object.keys(row).filter(
+    (field) => !knownFields.has(field) && !field.startsWith("hyp_"),
+  );
+  if (
+    missingFields.length > 0 ||
+    invalidFields.length > 0 ||
+    unexpectedFields.length > 0
+  ) {
+    const details = [
+      ...(missingFields.length === 0
+        ? []
+        : [`missing required fields: ${missingFields.join(", ")}`]),
+      ...(invalidFields.length === 0
+        ? []
+        : [
+            `unexpected required field shapes: ${[
+              ...new Set(invalidFields),
+            ].join(", ")}`,
+          ]),
+      ...(unexpectedFields.length === 0
+        ? []
+        : [`unexpected fields: ${unexpectedFields.join(", ")}`]),
+    ];
+    throw new Error(
+      `Vocal Money schema mismatch at row ${rowIndex}; ${details.join("; ")}.`,
+    );
+  }
+  const audioItem = audio[0];
   // Published hyp_* columns are intentionally not mapped. They are source
   // metadata, never Project Bridge benchmark results.
   return {
     rowIndex: value.row_idx,
-    audioUrl: audio.src,
+    audioUrl: audioItem.src,
+    audioMediaType: audioItem.type,
     clipId: row.clip_id,
     sourceDataset: row.source_dataset,
     sourceFile: row.source_file,

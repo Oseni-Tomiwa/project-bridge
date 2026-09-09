@@ -16,6 +16,7 @@ function row(index: number, band: VocalMoneyCmiBand): VocalMoneySourceRow {
   return {
     rowIndex: index,
     audioUrl: `https://assets.example/${index}.wav?signature=secret`,
+    audioMediaType: "audio/wav",
     clipId: `AS_${index.toString().padStart(3, "0")}`,
     sourceDataset: "AfriSwitch",
     sourceFile: `clip-${index}.wav`,

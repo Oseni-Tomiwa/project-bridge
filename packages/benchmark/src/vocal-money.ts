@@ -21,6 +21,7 @@ export type VocalMoneyCmiBand = "low" | "medium" | "high";
 export interface VocalMoneySourceRow {
   readonly rowIndex: number;
   readonly audioUrl: string;
+  readonly audioMediaType: "audio/wav";
   readonly clipId: string;
   readonly sourceDataset: string;
   readonly sourceFile: string;
@@ -53,6 +54,7 @@ export interface VocalMoneyMappedSample {
     license: typeof VOCAL_MONEY_SOURCE_LICENSE;
   }>;
   readonly sourceAudioUrl: string;
+  readonly sourceAudioMediaType: "audio/wav";
   readonly languagePair: string;
   readonly matrixLanguage: string;
   readonly domain: string;
@@ -74,7 +76,10 @@ export interface VocalMoneyMappedSample {
 }
 
 export interface VocalMoneyMaterializedSample
-  extends Omit<VocalMoneyMappedSample, "sourceAudioUrl"> {
+  extends Omit<
+    VocalMoneyMappedSample,
+    "sourceAudioUrl" | "sourceAudioMediaType"
+  > {
   readonly audio: Readonly<{
     assetId: string;
     relativePath: string;
@@ -181,6 +186,7 @@ export function mapVocalMoneyRow(
       license: VOCAL_MONEY_SOURCE_LICENSE,
     },
     sourceAudioUrl: row.audioUrl,
+    sourceAudioMediaType: row.audioMediaType,
     languagePair: row.languagePair,
     matrixLanguage: row.matrixLanguage,
     domain: row.domain,
@@ -238,6 +244,11 @@ export function validateVocalMoneySourceRows(
     ids.add(sampleId);
     if (!isHttpUrl(row.audioUrl))
       add("invalid-audio-url", "A valid HTTP(S) audio URL is required.");
+    if (row.audioMediaType !== "audio/wav")
+      add(
+        "invalid-audio-media-type",
+        "Published audio media type must be audio/wav.",
+      );
     for (const [field, value] of [
       ["source_dataset", row.sourceDataset],
       ["source_file", row.sourceFile],
@@ -353,7 +364,7 @@ export function associateVocalMoneyAudio(
       relativePath: audio.relativePath,
       contentSha256: audio.contentSha256,
       byteLength: audio.byteLength,
-      mediaType: "audio/wav",
+      mediaType: sample.sourceAudioMediaType,
       transformation: "none-original-published-bytes",
     },
   };

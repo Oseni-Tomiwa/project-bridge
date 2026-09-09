@@ -25,12 +25,17 @@ import {
 } from "../scripts/stt-benchmark-runner.mjs";
 
 const viewerRow = {
-  row_idx: 7,
+  row_idx: 0,
   row: {
-    audio: { src: "https://cdn.example/clip.wav?token=signed" },
-    clip_id: "AS_007",
+    audio: [
+      {
+        src: "https://datasets-server.huggingface.co/assets/clip.wav",
+        type: "audio/wav",
+      },
+    ],
+    clip_id: "AS_000",
     source_dataset: "AfriSwitch",
-    source_file: "source-7.wav",
+    source_file: "source-0.wav",
     language_pair: "yo-en",
     matrix_language: "yo",
     domain: "financial",
@@ -44,7 +49,11 @@ const viewerRow = {
     num_switch_points: 2,
     transcription: "Mo fẹ́ transfer owó.",
     transcription_tagged: "Mo fẹ́ [[EN]]transfer[[/EN]] owó.",
-    hyp_whisper_large_v3: "published provider output",
+    hyp_sahara_v2_5: "published Sahara output",
+    hyp_faster_whisper_large_v3: "published faster-whisper output",
+    hyp_mms_300m_yor_eng: "published MMS output",
+    hyp_w2v_bert_yoruba_500h: "published w2v-BERT output",
+    hyp_whisper_small_yoruba: "published provider output",
   },
   truncated_cells: [],
 };
@@ -96,14 +105,25 @@ describe("Vocal Money public preparation", () => {
   it("maps source fields while excluding published hypotheses", () => {
     const parsed = parseViewerRow(viewerRow);
     expect(parsed).toMatchObject({
-      clipId: "AS_007",
+      clipId: "AS_000",
+      audioMediaType: "audio/wav",
       transcription: "Mo fẹ́ transfer owó.",
       transcriptionTagged: "Mo fẹ́ [[EN]]transfer[[/EN]] owó.",
       cmiBand: "medium",
       samplingRateHz: 16000,
     });
-    expect(parsed).not.toHaveProperty("hyp_whisper_large_v3");
+    expect(parsed).not.toHaveProperty("hyp_sahara_v2_5");
     expect(JSON.stringify(parsed)).not.toContain("published provider output");
+  });
+
+  it("reports row-indexed missing, invalid, and unexpected field names", () => {
+    const invalid = { ...viewerRow, row: { ...viewerRow.row } };
+    delete invalid.row.source_file;
+    invalid.row.audio = { src: "https://example.invalid/clip.wav" };
+    invalid.row.renamed_metadata = "value";
+    expect(() => parseViewerRow(invalid)).toThrow(
+      "Vocal Money schema mismatch at row 0; missing required fields: source_file; unexpected required field shapes: audio; unexpected fields: renamed_metadata.",
+    );
   });
 
   it("parses development and full commands with an optional separator", () => {
@@ -122,13 +142,13 @@ describe("Vocal Money public preparation", () => {
     const directory = await mkdtemp(resolve(tmpdir(), "vocal-money-test-"));
     await mkdir(resolve(directory, "audio"));
     const bytes = new Uint8Array([82, 73, 70, 70]);
-    const audioPath = resolve(directory, "audio/vocal-money-as_007.wav");
+    const audioPath = resolve(directory, "audio/vocal-money-as_000.wav");
     await writeFile(audioPath, bytes);
     const revision = "a".repeat(40);
     const sample = associateVocalMoneyAudio(
       mapVocalMoneyRow(parseViewerRow(viewerRow), revision),
       {
-        relativePath: "audio/vocal-money-as_007.wav",
+        relativePath: "audio/vocal-money-as_000.wav",
         contentSha256:
           "a40ff3d5900fb7698b8c865041347cb49eccedc8f93945f89629ad104aaecce4",
         byteLength: bytes.byteLength,
@@ -150,7 +170,7 @@ describe("Vocal Money public preparation", () => {
       {
         manifest: {
           id: "vocal-money-codeswitch-dev-v0.1",
-          samples: [{ id: "vocal-money-as_007" }],
+          samples: [{ id: "vocal-money-as_000" }],
         },
       },
     );
