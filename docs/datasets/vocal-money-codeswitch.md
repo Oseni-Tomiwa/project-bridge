@@ -40,6 +40,18 @@ The prepared manifest uses the same provider-neutral audio and reference fields 
 
 The public table includes columns whose names begin with `hyp_`. Project Bridge deliberately omits them from mapped samples and frozen manifests. They are source-published comparison metadata, not results from a Project Bridge run, and cannot be combined with current provider outputs, latency, configurations, or run IDs. A future analysis may import them only into a separately named source-analysis artifact with their original provenance and limitations.
 
+## Audio quality review
+
+Materialization retains every selected source sample and never edits its transcript or source metadata. The separate `evaluation/reviews/vocal-money-audio-quality.v0.1.json` manifest binds review decisions to the dataset manifest identity, source revision, sample ID, and audio checksum. Review states are `usable`, `unusable`, and `uncertain`: later metric aggregation must include usable samples, exclude unusable samples, and hold uncertain samples for manual review. Provider execution and already-produced results remain preserved independently of that scoring disposition.
+
+Run the local, provider-free diagnostic report after materialization:
+
+```bash
+pnpm --filter @project-bridge/evaluation quality:vocal-money
+```
+
+If more than one matching materialization exists, pass `--manifest <path>`. The diagnostic validates readable PCM-16 WAV structure and reports format, duration, non-zero samples, normalized peak/RMS amplitude, clipping percentage, and conservative silence/near-silence signals. Silence means every PCM sample is zero. Near-silence requires non-zero audio with normalized RMS at most `0.003` and peak at most `0.02`; clipping is flagged when at least 1% of samples reach the PCM-16 extrema. Duration is flagged when it differs from source metadata by more than the greater of 100 ms or 2%. These are review triggers, not automatic final quality judgments. The tool does not perform speech recognition or infer intelligibility. `vocal-money-as_076` remains `uncertain` and held for explicit manual review after an automated duration discrepancy; the automated report does not infer reference alignment or hardcode a final exclusion decision.
+
 ## Boundaries and unresolved governance
 
 - Raw audio and generated manifests remain local and gitignored.

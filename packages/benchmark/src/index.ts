@@ -10,6 +10,7 @@ export * from "./yoruba.js";
 export * from "./normalization.js";
 export * from "./afriswitch.js";
 export * from "./vocal-money.js";
+export * from "./audio-quality.js";
 export * from "./stt-batch.js";
 
 export interface RecordingDeviceMetadata {

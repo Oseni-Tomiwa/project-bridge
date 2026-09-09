@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.1",
+  "id": "vocal-money-audio-quality-review-v0.1",
+  "datasetManifest": {
+    "id": "vocal-money-codeswitch-dev-v0.1",
+    "version": "0.1",
+    "sourceRevision": "c1812790ff33e0dfa05e9811c8132605aef3436e"
+  },
+  "scoringPolicy": {
+    "usable": "include",
+    "unusable": "exclude",
+    "uncertain": "hold-for-review",
+    "preserveProviderResults": true
+  },
+  "reviews": [
+    {
+      "sampleId": "vocal-money-as_076",
+      "audioContentSha256": "e525302fd0b629c87884f5804fbf0b8809313966234abdfbb6786ff49529a1f1",
+      "state": "uncertain",
+      "reasons": ["duration-metadata-mismatch"],
+      "reviewStatus": "pending-manual",
+      "note": "Manual audio-quality exclusion review is required after the WAV duration differed from the published duration; automated signal diagnostics must not infer intelligibility or reference alignment."
+    }
+  ]
+}
