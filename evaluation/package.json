@@ -6,6 +6,7 @@
   "scripts": {
     "benchmark:stt": "pnpm --filter @project-bridge/benchmark build && pnpm --filter @project-bridge/speech build && node scripts/run-stt-benchmark.mjs",
     "prepare:afriswitch:yoruba": "pnpm --filter @project-bridge/benchmark build && node scripts/prepare-afriswitch-yoruba.mjs",
+    "prepare:vocal-money": "pnpm --filter @project-bridge/benchmark build && node scripts/prepare-vocal-money.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

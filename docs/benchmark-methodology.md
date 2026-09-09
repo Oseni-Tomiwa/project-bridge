@@ -8,6 +8,8 @@ The initial text-only ground-truth layer and its limitations are documented in t
 
 The primary external code-switching ASR source is the official `intronhealth/AfriSwitch` dataset with config `yoruba` and split `test`. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the source revision remains unresolved until materialization. Its deterministic, opt-in preparation process is documented in the [AfriSwitch Yoruba guide](datasets/afriswitch-yoruba.md). Official-source, Project Bridge synthetic, and Project Bridge domain-recording results are distinct dataset slices and must not be pooled without source labels and separate counts.
 
+The public `Kimyayd/vocal-money-codeswitch-asr-benchmark` `default/train` split is a separately identified **secondary development benchmark**, not a replacement or substitute test set. Its v0.1 preparation uses 30 samples selected deterministically with `project-bridge-vocal-money-dev-v1`, balanced across the published low/medium/high CMI bands; `--all` supports an explicitly named full 210-row run. See the [Vocal Money guide](datasets/vocal-money-codeswitch.md). Published `hyp_*` columns are omitted: they lack the Project Bridge run identity, live configuration snapshot, and shared timing protocol required of current results.
+
 ## Dataset design
 
 Each de-identified sample should have a stable ID, an audio asset ID and SHA-256 digest, a human-verified reference transcript with annotation protocol/version, and stratification metadata:
@@ -42,6 +44,8 @@ Report sample counts and audio duration overall and per slice. Identify repeated
 8. Calculate metrics from code, not by hand, and preserve the run configuration with outputs.
 
 For AfriSwitch, the preparation manifest requires one downloaded/checksummed audio asset per selected source row and declares no preprocessing or transcoding. All provider runs reference that one asset. If any provider cannot accept the original format, preparation must stop until one canonical conversion policy can be applied equally and recorded with transformation provenance and input/output checksums.
+
+Vocal Money preparation likewise records the original published WAV bytes once per selected sample and supplies the same provider-neutral manifest shape to the runner. Results must retain `vocal-money-codeswitch-dev-v0.1` as their manifest identity and must never be pooled silently with the primary AfriSwitch challenge slice. Dataset source, revision, sample ID, audio checksum, provider configuration, and run ID jointly define comparison provenance.
 
 Every persisted result repeats its sanitized provider configuration snapshot. The foundation exposes a consistency check that compares the result snapshot with the matching configuration ID in the frozen run; a runner must reject the result if the run ID, model version, region, or options differ.
 

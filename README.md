@@ -68,6 +68,7 @@ To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and s
 - [Batch STT benchmark runner](docs/stt-batch-runner.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
 - [AfriSwitch Yoruba dataset preparation](docs/datasets/afriswitch-yoruba.md)
+- [Vocal Money secondary development dataset](docs/datasets/vocal-money-codeswitch.md)
 - [Intron/Sahara STT adapter](docs/providers/intron-sahara-stt.md)
 - [OpenAI STT adapter](docs/providers/openai-stt.md)
 - [Deepgram STT adapter](docs/providers/deepgram-stt.md)
@@ -82,6 +83,8 @@ Do not commit credentials, raw participant audio, direct identifiers, consent ev
 The current evaluation layer contains 36 synthetic Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. It contains no audio, provider output, scores, or fabricated metrics; the Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
 
 The official `intronhealth/AfriSwitch` Yoruba `test` split is configured as the primary external code-switching ASR source. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the Hugging Face revision remains unresolved until the first materialization run. No dataset audio is committed or downloaded by normal checks. The opt-in preparation script downloads only the selected clips and writes a checksummed local manifest; see the [dataset guide](docs/datasets/afriswitch-yoruba.md). AfriSwitch results must remain identified separately from Project Bridge's synthetic and domain-specific samples.
+
+The public `Kimyayd/vocal-money-codeswitch-asr-benchmark` dataset is configured only as a secondary development benchmark. Its frozen v0.1 preparation selects 30 of 210 rows with seed `project-bridge-vocal-money-dev-v1`, targeting 10 samples from each published CMI band. It remains separately identified from the primary AfriSwitch challenge slice. Source-published `hyp_*` columns are excluded from Project Bridge results. No Vocal Money audio is downloaded by normal checks and no benchmark has been run; see the [dataset guide](docs/datasets/vocal-money-codeswitch.md).
 
 A sequential, resumable STT batch runner can validate local/mock or materialized manifests, verify audio checksums, and checkpoint provider/sample successes or failures under the gitignored `evaluation/results/` directory. Its automated tests use fake providers only. No AfriSwitch benchmark has been executed; the three-provider comparison begins only after official materialization succeeds. See the [runner guide](docs/stt-batch-runner.md).
 

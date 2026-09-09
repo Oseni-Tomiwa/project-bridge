@@ -6,6 +6,8 @@
 
 **Decision:** the official `intronhealth/AfriSwitch` Yoruba `test` split is the primary external ASR benchmark source. Project Bridge v0.1 freezes the first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; its Hugging Face revision will be resolved and frozen during the first materialization run. Its approximately 5 hours/1,877 general conversational Yoruba-English utterances remain a separate source from the 36 Project Bridge synthetic/domain fixtures and from `real-yo-001`. AfriSwitch supplies ASR references and mixing metadata, not automatic failed-transfer ground truth.
 
+**Decision:** the public `Kimyayd/vocal-money-codeswitch-asr-benchmark` `default/train` split is a secondary development source only. The v0.1 development slice uses 30 samples, seed `project-bridge-vocal-money-dev-v1`, and equal low/medium/high CMI targets. It can exercise the same Sahara/OpenAI/Deepgram runner before final challenge reporting, but cannot replace, enlarge, or be silently combined with the primary AfriSwitch test slice. Its published provider-hypothesis columns are excluded from Project Bridge results.
+
 The fixtures live in `evaluation/fixtures/yoruba-failed-transfer.v0.1.mts`. They are evenly divided across four declared language-mix slices: Yoruba-heavy, Yoruba-English code-switching, Yoruba-Pidgin code-switching, and Nigerian English. Within each slice, the corpus covers complete requests, missing required information, unsupported requests, and credential-like input that must be rejected without retaining a credential value.
 
 Yoruba is the initial focus because the project needs one concrete language context in which to test code-switching, orthographic variation, clarification, and safety labels. This is a project sequencing decision, not an empirical conclusion that one language, dialect, or provider is more important or performs better.
@@ -63,6 +65,8 @@ The batch runner is ready for local/mock manifests and fake-provider tests. It v
 
 For the external AfriSwitch slice, preserve the official raw and tagged transcripts, then compute strict normalized WER and the optional diacritic-insensitive sensitivity view separately. CER requires a versioned implementation before it can be reported. Intent/entity/task evaluation is absent unless a particular utterance later receives justified, reviewed domain annotation; it must never be inferred from the dataset's ASR labels.
 
+The same transcription-only separation applies to Vocal Money. Preserve its exact raw/tagged references and code-switch metadata, but do not derive failed-transfer intent, entity, action, or downstream-success labels from its financial-domain label or wording.
+
 ## Known limitations and review gates
 
 - The corpus is small, hand-authored, synthetic, and scoped to one intent; it cannot estimate real-world accuracy.
@@ -72,3 +76,4 @@ For the external AfriSwitch slice, preserve the official raw and tagged transcri
 - Slice sizes are useful for fixture coverage, not statistical comparison.
 - The exact audio protocol, primary normalization profile, entity matching rules, and task-success rubric remain product/research decisions.
 - The AfriSwitch source revision, license/commercial-use interpretation, provider-processing approval, attribution/share-alike treatment, and retention policy remain unresolved before materialization or provider runs.
+- Vocal Money's derivative provenance and `CC-BY-NC-SA-4.0` declaration do not resolve the dataset card's notice that speakers did not consent specifically to the derivative, source-corpus terms, third-party provider-upload permission, non-commercial scope, attribution/ShareAlike handling, or retention; these remain review gates.

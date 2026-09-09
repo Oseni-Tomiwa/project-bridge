@@ -31,6 +31,8 @@ Nothing in this list is selected unless moved to a dated decision record.
 ## Data and evaluation
 
 - Exact AfriSwitch source revision to freeze for the first measured run
+- Exact Vocal Money source revision resolved by the first preparation run, and whether the 30-sample development slice or a separately named full 210-row run is appropriate for each analysis
+- Legal/product approval for Vocal Money's derivative AfriSwitch provenance and declared CC BY-NC-SA 4.0 terms, including consent provenance, third-party processing, non-commercial scope, attribution/share-alike, retention, and derived-result publication
 - Legal/product approval for CC BY-NC-SA 4.0 obligations, third-party provider processing, attribution, derived results, and intended use
 - Local access, retention/deletion, and cleanup policy for materialized AfriSwitch audio and manifests
 - Whether all compared providers accept the original AfriSwitch source format; if not, one shared canonical transcoding specification
