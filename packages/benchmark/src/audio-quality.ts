@@ -23,6 +23,7 @@ export interface AudioQualityReviewEntry {
   readonly state: AudioQualityState;
   readonly reasons: readonly AudioQualityReason[];
   readonly reviewStatus: AudioQualityReviewStatus;
+  readonly reviewMethod?: "human-listening" | "automated-diagnostic";
   readonly note?: string;
   readonly reviewedAt?: string;
   readonly reviewerId?: string;
@@ -114,8 +115,8 @@ export function validateAudioQualityReviewManifest(
       issues.push(`${prefix}.state is invalid.`);
     if (
       !Array.isArray(review.reasons) ||
-      review.reasons.length === 0 ||
-      review.reasons.some((reason) => !isAudioQualityReason(reason))
+      review.reasons.some((reason) => !isAudioQualityReason(reason)) ||
+      (review.state !== "usable" && review.reasons.length === 0)
     )
       issues.push(`${prefix}.reasons must contain recognized reasons.`);
     if (
@@ -130,11 +131,11 @@ export function validateAudioQualityReviewManifest(
       issues.push(`${prefix} pending manual review must remain uncertain.`);
     if (
       review.reviewStatus === "completed-manual" &&
-      (!isNonEmptyString(review.reviewedAt) ||
-        !isNonEmptyString(review.reviewerId))
+      (review.reviewMethod !== "human-listening" ||
+        !isNonEmptyString(review.reviewedAt))
     )
       issues.push(
-        `${prefix} completed manual review requires reviewedAt and reviewerId.`,
+        `${prefix} completed manual review requires human-listening method and reviewedAt.`,
       );
   }
   return issues;

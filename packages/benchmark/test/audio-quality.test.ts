@@ -45,4 +45,22 @@ describe("audio quality review contracts", () => {
       }),
     ).toContain("reviews[0] pending manual review must remain uncertain.");
   });
+
+  it("accepts a completed usable human review without a defect reason", () => {
+    expect(
+      validateAudioQualityReviewManifest({
+        ...baseManifest,
+        reviews: [
+          {
+            ...baseManifest.reviews[0],
+            state: "usable",
+            reasons: [],
+            reviewStatus: "completed-manual",
+            reviewMethod: "human-listening",
+            reviewedAt: "2026-09-09",
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
 });

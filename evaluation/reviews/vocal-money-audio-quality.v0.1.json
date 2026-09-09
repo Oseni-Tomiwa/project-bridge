@@ -17,9 +17,41 @@
       "sampleId": "vocal-money-as_076",
       "audioContentSha256": "e525302fd0b629c87884f5804fbf0b8809313966234abdfbb6786ff49529a1f1",
       "state": "uncertain",
-      "reasons": ["duration-metadata-mismatch"],
-      "reviewStatus": "pending-manual",
-      "note": "Manual audio-quality exclusion review is required after the WAV duration differed from the published duration; automated signal diagnostics must not infer intelligibility or reference alignment."
+      "reasons": ["unintelligible"],
+      "reviewStatus": "completed-manual",
+      "reviewMethod": "human-listening",
+      "reviewedAt": "2026-09-09",
+      "note": "Speech is not sufficiently clear for confident human verification."
+    },
+    {
+      "sampleId": "vocal-money-as_080",
+      "audioContentSha256": "2070a24ff835d467b40d34d644d70e815f319ee8729db253dd2bd9b1fac43fd1",
+      "state": "uncertain",
+      "reasons": ["unintelligible"],
+      "reviewStatus": "completed-manual",
+      "reviewMethod": "human-listening",
+      "reviewedAt": "2026-09-09",
+      "note": "Speech is not sufficiently clear for confident human verification."
+    },
+    {
+      "sampleId": "vocal-money-as_130",
+      "audioContentSha256": "2991c1b297ca4992f43f48e11a23d7ffc62987f99e05bb8c5a867f8085ced790",
+      "state": "uncertain",
+      "reasons": ["unintelligible"],
+      "reviewStatus": "completed-manual",
+      "reviewMethod": "human-listening",
+      "reviewedAt": "2026-09-09",
+      "note": "Speech is not sufficiently clear for confident human verification."
+    },
+    {
+      "sampleId": "vocal-money-as_178",
+      "audioContentSha256": "8d11552ad45b4368879172fd365ec0a4a66b07d0f2b28b1422b96722fb36d1af",
+      "state": "usable",
+      "reasons": [],
+      "reviewStatus": "completed-manual",
+      "reviewMethod": "human-listening",
+      "reviewedAt": "2026-09-09",
+      "note": "Human listening confirmed intelligible speech despite automated clipping flag."
     }
   ]
 }
