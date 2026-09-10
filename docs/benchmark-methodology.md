@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Evaluate code-switched speech providers fairly and reproducibly, then measure whether transcription quality carries through to the selected downstream task. No benchmark has been run and this repository contains no scores.
+Evaluate code-switched speech providers fairly and reproducibly, then measure whether transcription quality carries through to the selected downstream task. A completed local Vocal Money secondary/development run is now scored separately; the primary AfriSwitch challenge benchmark has not run.
 
 The initial text-only ground-truth layer and its limitations are documented in the [Yoruba-first evaluation plan](yoruba-evaluation-plan.md). It does not alter the governed audio-manifest and run requirements below.
 
@@ -61,7 +61,7 @@ The implemented Deepgram adapter records `nova-3`, requested version `latest`, e
 
 `evaluation/manifests/real-yo-001-comparison.v0.1.mts` prepares one reference/audio identity with separate Sahara, OpenAI, and Deepgram result slots. It is not a runnable governed sample yet: checksum, duration, technical metadata, provenance, consent, third-party processing permission, license, retention, and reviewer state remain unverified. Provider hypotheses and latency do not belong in that preparation record and no OpenAI or Deepgram result is asserted.
 
-No AfriSwitch batch has run. The batch runner's test records come only from local temporary fixtures and fake providers; they are not benchmark evidence. Real comparison starts only after the official frozen 75-sample manifest and audio are materialized successfully.
+No AfriSwitch batch has run. The completed `vocal-money-dev-30-v1` run covers 30 secondary/development samples across Sahara, OpenAI, and Deepgram. It must not be presented as the final challenge comparison. Three uncertain clips are held out of its 27-sample primary development aggregate; the other 26 unreviewed clips are labeled diagnostics-passed/unreviewed rather than human-approved. See the [metric aggregation guide](stt-metrics.md).
 
 ## Metrics
 
@@ -71,12 +71,12 @@ WER = `(substitutions + deletions + insertions) / reference word count`. Record 
 
 Normalization choices—Unicode form, case folding, punctuation, whitespace, number handling, filler words, and orthographic variants—can change the result. Preserve both raw and normalized text. Do not transliterate or translate unless that is a separate, declared analysis.
 
-The Yoruba fixture layer defines `yoruba-strict@0.1` as the current primary candidate and `yoruba-diacritic-insensitive-analysis@0.1` as an optional sensitivity view. The latter must never be substituted silently for the primary result. The product/research team must review and freeze the primary profile before a measured run.
+The Yoruba fixture layer defines `yoruba-strict@0.1` as the current primary profile for this development run and `yoruba-diacritic-insensitive-analysis@0.1` as an optional sensitivity view. The latter must never be substituted silently for the primary result. A changed normalization policy requires a new version and separately identified analysis.
 
 ### Other transcription metrics
 
 - Exact-match or token accuracy only with an explicit definition.
-- Character error rate where word boundaries are ambiguous. CER is planned for the AfriSwitch ASR slice but is not implemented yet.
+- Character error rate over Unicode code points. Raw CER includes original whitespace; strict normalized CER includes the collapsed U+0020 spaces produced by `yoruba-strict@0.1`. Yoruba diacritics remain distinct in the strict score.
 - Language/code-switch preservation measures once language pairs are selected.
 - Failure/empty transcript rate.
 

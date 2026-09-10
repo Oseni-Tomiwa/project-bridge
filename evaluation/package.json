@@ -8,6 +8,7 @@
     "prepare:afriswitch:yoruba": "pnpm --filter @project-bridge/benchmark build && node scripts/prepare-afriswitch-yoruba.mjs",
     "prepare:vocal-money": "pnpm --filter @project-bridge/benchmark build && node scripts/prepare-vocal-money.mjs",
     "quality:vocal-money": "pnpm --filter @project-bridge/benchmark build && node scripts/report-vocal-money-audio-quality.mjs",
+    "metrics:stt": "pnpm --filter @project-bridge/benchmark build && node scripts/run-stt-metrics.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

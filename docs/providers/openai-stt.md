@@ -45,7 +45,7 @@ Only upload audio whose consent, license, allowed uses, third-party processing p
 
 Automated tests mock the HTTP boundary and spend no API credits. They verify request construction, mapping, failure handling, configuration hygiene, one-attempt behavior, and byte-identical input reuse across the Sahara and OpenAI adapters.
 
-No live OpenAI request or OpenAI benchmark result has been produced by this implementation. The repository therefore makes no quality or latency comparison between OpenAI and Sahara.
+The adapter participated in the local `vocal-money-dev-30-v1` secondary development run. Those generated results remain gitignored and do not constitute the primary AfriSwitch challenge comparison or a final provider ranking.
 
 ## Known limitations
 

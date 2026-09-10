@@ -2,7 +2,7 @@
 
 ## Status
 
-This document describes the implemented voice-first financial-support slice and provider-neutral boundaries. Intron/Sahara is wired into the product flow through the API; OpenAI and Deepgram remain evaluation adapters. No comparative benchmark has been run.
+This document describes the implemented voice-first financial-support slice and provider-neutral boundaries. Intron/Sahara is wired into the product flow through the API; OpenAI and Deepgram remain evaluation adapters. A three-provider Vocal Money development run exists separately from the product flow; the primary AfriSwitch challenge comparison has not run.
 
 ## Shape
 

@@ -4,7 +4,7 @@
 
 Project Bridge explores a voice-first AI access layer through which a person can speak naturally, be understood across code-switched speech, clarify missing information, confirm consequential actions, trigger a downstream task, and receive an accessible response.
 
-The first vertical slice is a simulated failed/pending-transfer support journey. It records an explicitly initiated browser voice message, sends it through the API to Intron/Sahara, shows an editable transcript, then uses deterministic text rules to clarify missing information, request explicit confirmation, and create an in-memory support case. Text entry remains available. It does **not** connect to a bank or perform a banking action. OpenAI and Deepgram remain benchmark providers rather than product-flow fallbacks, and no comparative benchmark has been run. An LLM, durable storage, authentication, and TTS are not implemented.
+The first vertical slice is a simulated failed/pending-transfer support journey. It records an explicitly initiated browser voice message, sends it through the API to Intron/Sahara, shows an editable transcript, then uses deterministic text rules to clarify missing information, request explicit confirmation, and create an in-memory support case. Text entry remains available. It does **not** connect to a bank or perform a banking action. OpenAI and Deepgram remain benchmark providers rather than product-flow fallbacks. A local three-provider Vocal Money development run now exists, but it is not the primary AfriSwitch challenge benchmark and does not establish a final model ranking. An LLM, durable storage, authentication, and TTS are not implemented.
 
 ## Decision labels
 
@@ -66,6 +66,7 @@ To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and s
 - [Voice-first product flow](docs/voice-product-flow.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
 - [Batch STT benchmark runner](docs/stt-batch-runner.md)
+- [STT metric aggregation](docs/stt-metrics.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
 - [AfriSwitch Yoruba dataset preparation](docs/datasets/afriswitch-yoruba.md)
 - [Vocal Money secondary development dataset](docs/datasets/vocal-money-codeswitch.md)
@@ -80,13 +81,13 @@ To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and s
 
 Do not commit credentials, raw participant audio, direct identifiers, consent evidence, or generated evaluation results that may contain personal data. The audio, result, and private-metadata paths are ignored by default. Metadata intended for version control must be de-identified and reviewed first.
 
-The current evaluation layer contains 36 synthetic Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. It contains no audio, provider output, scores, or fabricated metrics; the Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
+The synthetic fixture layer contains 36 Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. Those fixtures contain no audio, provider output, scores, or fabricated metrics; their Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
 
 The official `intronhealth/AfriSwitch` Yoruba `test` split is configured as the primary external code-switching ASR source. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the Hugging Face revision remains unresolved until the first materialization run. No dataset audio is committed or downloaded by normal checks. The opt-in preparation script downloads only the selected clips and writes a checksummed local manifest; see the [dataset guide](docs/datasets/afriswitch-yoruba.md). AfriSwitch results must remain identified separately from Project Bridge's synthetic and domain-specific samples.
 
-The public `Kimyayd/vocal-money-codeswitch-asr-benchmark` dataset is configured only as a secondary development benchmark. Its frozen v0.1 preparation selects 30 of 210 rows with seed `project-bridge-vocal-money-dev-v1`, targeting 10 samples from each independently derived Project Bridge CMI selection bucket while preserving the dataset's published band labels verbatim. It remains separately identified from the primary AfriSwitch challenge slice. Source-published `hyp_*` columns are excluded from Project Bridge results. No Vocal Money audio is downloaded by normal checks and no benchmark has been run; see the [dataset guide](docs/datasets/vocal-money-codeswitch.md).
+The public `Kimyayd/vocal-money-codeswitch-asr-benchmark` dataset is configured only as a secondary development benchmark. Its frozen v0.1 preparation selects 30 of 210 rows with seed `project-bridge-vocal-money-dev-v1`, targeting 10 samples from each independently derived Project Bridge CMI selection bucket while preserving the dataset's published band labels verbatim. It remains separately identified from the primary AfriSwitch challenge slice. Source-published `hyp_*` columns are excluded from Project Bridge results. A completed local `vocal-money-dev-30-v1` run has 90 successful Sahara/OpenAI/Deepgram results; metric aggregation holds three uncertain clips and scores 27 samples per provider. Generated audio, raw results, and metrics stay gitignored. See the [dataset guide](docs/datasets/vocal-money-codeswitch.md) and [metrics guide](docs/stt-metrics.md).
 
-A sequential, resumable STT batch runner can validate local/mock or materialized manifests, verify audio checksums, and checkpoint provider/sample successes or failures under the gitignored `evaluation/results/` directory. Its automated tests use fake providers only. No AfriSwitch benchmark has been executed; the three-provider comparison begins only after official materialization succeeds. See the [runner guide](docs/stt-batch-runner.md).
+A sequential, resumable STT batch runner can validate local/mock or materialized manifests, verify audio checksums, and checkpoint provider/sample successes or failures under the gitignored `evaluation/results/` directory. Automated tests use fake providers only. The Vocal Money development run does not change the requirement that the primary three-provider AfriSwitch comparison begins only after official materialization and governance approval. See the [runner guide](docs/stt-batch-runner.md).
 
 Each real provider adapter has a separate, explicit smoke test. None is run by normal checks:
 

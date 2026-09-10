@@ -79,7 +79,7 @@ Each selected audio file is downloaded and checksummed once. Sahara, OpenAI, and
 
 ## Supported and unsupported evaluation
 
-AfriSwitch supports external ASR evaluation using raw/normalized WER, future CER, provider failures, and provider-request latency. The current repository implements WER but not yet CER calculation. Latency exists only after real provider requests and is not part of this preparation manifest.
+AfriSwitch supports external ASR evaluation using raw/normalized WER and CER, provider failures, and provider-request latency. The repository's versioned metric layer implements those text metrics, but no AfriSwitch provider run or metric exists yet. Latency exists only after real provider requests and is not part of this preparation manifest.
 
 General AfriSwitch utterances do not automatically describe failed transfers. The mapper therefore sets downstream labels to `null`. It does not invent financial intent, entity/slot, clarification, action, or task-success ground truth. Those measurements remain tied to Project Bridge's separately identified synthetic/domain recordings unless a specific external sample receives justified, reviewed annotation later.
 
