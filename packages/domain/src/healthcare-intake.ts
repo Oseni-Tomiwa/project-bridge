@@ -514,6 +514,7 @@ function clarification(
 export function summarizeHealthcareIntake(
   fields: HealthcareIntakeFields,
 ): string {
+  const concern = fields.reportedConcern.replace(/[.!?]+$/u, "");
   const symptoms =
     fields.reportedSymptoms.length === 0
       ? "No specific symptom phrase was identified"
@@ -526,7 +527,7 @@ export function summarizeHealthcareIntake(
     fields.requestedService === undefined
       ? "No service preference was stated"
       : `Requested service: ${fields.requestedService}`;
-  return `You reported: ${fields.reportedConcern}. ${symptoms}. ${duration}. ${service}. This summarizes your words and is not a diagnosis.`;
+  return `You reported: ${concern}. ${symptoms}. ${duration}. ${service}. This summarizes your words and is not a diagnosis.`;
 }
 
 function stableFingerprint(fields: HealthcareIntakeFields): string {

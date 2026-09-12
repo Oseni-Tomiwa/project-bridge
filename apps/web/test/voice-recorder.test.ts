@@ -262,5 +262,8 @@ describe("voice recorder web flow", () => {
     expect(html).toContain("This is a simulation, not medical advice.");
     expect(html).toContain("optional first name or nickname");
     expect(html).toContain("you can skip it");
+    expect(html).toContain('id="flow-state"');
+    expect(html).toContain("Review the transcript");
+    expect(html).toContain("Use this transcript");
   });
 });

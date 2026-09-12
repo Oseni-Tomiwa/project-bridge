@@ -13,7 +13,10 @@
     <a class="skip-link" href="#main-content">Skip to conversation</a>
     <main id="main-content">
       <header>
-        <p class="eyebrow">Temporary codename · Challenge prototype</p>
+        <p class="eyebrow">
+          <span class="status-pill">Simulation</span>
+          Voice-first clinic intake
+        </p>
         <h1>Tell a clinic your concern, in your own words.</h1>
         <p class="lede">
           Speak naturally in Yoruba, Nigerian English, Pidgin, or Yoruba-English
@@ -32,7 +35,10 @@
       </aside>
 
       <section class="conversation" aria-labelledby="conversation-heading">
-        <h2 id="conversation-heading">Conversation</h2>
+        <div class="conversation-heading">
+          <h2 id="conversation-heading">Your intake conversation</h2>
+          <p id="flow-state" class="flow-state">Starting…</p>
+        </div>
         <ol id="history" class="history" aria-live="polite"></ol>
         <div id="interaction">
           <section
@@ -94,16 +100,22 @@
           </section>
 
           <form id="transcript-form" class="transcript-panel" hidden>
-            <p class="transcript-label">We heard:</p>
+            <h3>Review the transcript</h3>
+            <p class="transcript-help">
+              Check every word before it enters your intake conversation.
+            </p>
+            <p class="transcript-label">Original transcription</p>
             <blockquote id="raw-transcript"></blockquote>
-            <label for="transcript">Check or correct the transcript</label>
+            <label for="transcript">Edit the transcript if needed</label>
             <textarea id="transcript" rows="4" required></textarea>
             <p class="small">
               Your edited text—not the original recording—continues into the
               support flow.
             </p>
             <div class="button-row">
-              <button id="continue-transcript" type="submit">Continue</button>
+              <button id="continue-transcript" type="submit">
+                Use this transcript
+              </button>
               <button id="record-again" class="secondary-button" type="button">
                 Record again
               </button>
@@ -113,7 +125,9 @@
           <details id="text-fallback" class="text-fallback">
             <summary>Prefer to type instead?</summary>
             <form id="utterance-form">
-              <label for="utterance">What should the clinic know?</label>
+              <label id="utterance-label" for="utterance"
+                >What should the clinic know?</label
+              >
               <textarea
                 id="utterance"
                 name="utterance"
@@ -132,6 +146,8 @@
           </details>
         </div>
         <div id="confirmation" class="confirmation" hidden>
+          <p class="panel-kicker">Ready for your confirmation</p>
+          <h3>Review your simulated intake</h3>
           <p id="proposal-summary"></p>
           <button id="confirm" type="button">
             Yes, create simulated clinic intake
