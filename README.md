@@ -68,6 +68,7 @@ To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and s
 - [Benchmark methodology](docs/benchmark-methodology.md)
 - [Batch STT benchmark runner](docs/stt-batch-runner.md)
 - [STT metric aggregation](docs/stt-metrics.md)
+- [STT benchmark report](docs/benchmark-report.md)
 - [Yoruba-first evaluation plan](docs/yoruba-evaluation-plan.md)
 - [AfriSwitch Yoruba dataset preparation](docs/datasets/afriswitch-yoruba.md)
 - [Vocal Money secondary development dataset](docs/datasets/vocal-money-codeswitch.md)
