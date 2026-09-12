@@ -15,17 +15,19 @@
 
 ## Current implementation status
 
-| Area                        | Status                             |
-| --------------------------- | ---------------------------------- |
-| Provider-neutral repository | Foundation created                 |
-| Specific vertical           | Financial-service support selected |
-| Sahara integration          | Default product STT via API        |
-| Competitor integrations     | OpenAI and Deepgram adapters added |
-| Speech dataset              | Not collected                      |
-| Benchmark execution         | Contracts only; no results         |
-| Downstream action           | Simulated support-case creation    |
-| Voice input                 | Browser recording and review added |
-| Voice response              | Not implemented                    |
-| Responsible AI plan         | Initial documentation only         |
+| Area                        | Status                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| Provider-neutral repository | Foundation created                                                             |
+| Specific vertical           | Healthcare intake/navigation active                                            |
+| Sahara integration          | Default product STT via API                                                    |
+| Competitor integrations     | OpenAI and Deepgram adapters added                                             |
+| Speech dataset              | AfriSwitch primary planned; Vocal Money development slice materialized locally |
+| Benchmark execution         | Vocal Money development run complete; primary AfriSwitch not run               |
+| Downstream action           | Confirmed simulated clinic-intake creation                                     |
+| Voice input                 | Browser recording and review added                                             |
+| Voice response              | Not implemented                                                                |
+| Responsible AI plan         | Initial documentation only                                                     |
 
 No undocumented behavior is assumed for Sahara or any competitor API.
+
+The healthcare workflow satisfies the downstream-task requirement only by creating a confirmed structured simulated clinic intake. It does not diagnose, prescribe, recommend treatment, contact a clinic, or claim an appointment. Emergency-language handling is a conservative safety stop, not comprehensive medical triage.

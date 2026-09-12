@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { ActionExecutor } from "@project-bridge/actions";
 import type { ConversationInterpreter } from "@project-bridge/conversation";
-import { validateDomainModule } from "../src/index.js";
+import {
+  InMemoryClinicIntakeRepository,
+  createHealthcareIntakeDomainModule,
+  validateDomainModule,
+} from "../src/index.js";
 
 const interpreter: ConversationInterpreter = {
   async interpret() {
@@ -51,5 +55,17 @@ describe("validateDomainModule", () => {
         actions: [executor("example.submit"), executor("example.submit")],
       }),
     ).toContain("Duplicate action name: example.submit");
+  });
+
+  it("accepts the active healthcare-intake domain module", () => {
+    expect(
+      validateDomainModule(
+        createHealthcareIntakeDomainModule({
+          intakes: new InMemoryClinicIntakeRepository(),
+          now: () => new Date("2026-09-12T00:00:00.000Z"),
+          createId: (kind) => `${kind}-test`,
+        }),
+      ),
+    ).toEqual([]);
   });
 });

@@ -4,7 +4,7 @@
 
 Project Bridge explores a voice-first AI access layer through which a person can speak naturally, be understood across code-switched speech, clarify missing information, confirm consequential actions, trigger a downstream task, and receive an accessible response.
 
-The first vertical slice is a simulated failed/pending-transfer support journey. It records an explicitly initiated browser voice message, sends it through the API to Intron/Sahara, shows an editable transcript, then uses deterministic text rules to clarify missing information, request explicit confirmation, and create an in-memory support case. Text entry remains available. It does **not** connect to a bank or perform a banking action. OpenAI and Deepgram remain benchmark providers rather than product-flow fallbacks. A local three-provider Vocal Money development run now exists, but it is not the primary AfriSwitch challenge benchmark and does not establish a final model ranking. An LLM, durable storage, authentication, and TTS are not implemented.
+The active vertical slice is a simulated healthcare-intake journey. It records an explicitly initiated browser voice message, sends it through the API to Intron/Sahara, shows an editable transcript, then uses deterministic text rules to preserve user-reported concerns, ask narrow clarifications, stop routine intake on explicit emergency language, request confirmation, and create an in-memory simulated clinic intake. Text entry remains available. It does **not** diagnose, recommend treatment, prescribe, contact a clinic, or book an appointment. The former financial-support implementation remains preserved as prior domain work. OpenAI and Deepgram remain benchmark providers rather than product-flow fallbacks. A local three-provider Vocal Money development run exists, but it is not the primary AfriSwitch challenge benchmark and does not establish a final model ranking. An LLM, durable storage, authentication, and TTS are not implemented.
 
 ## Decision labels
 
@@ -19,8 +19,8 @@ Documentation uses these labels consistently:
 
 ```text
 apps/
-  web/           Accessible voice-first financial-support demo with text fallback
-  api/           Server-side STT, conversation, and simulated support-case API
+  web/           Accessible voice-first healthcare-intake demo with text fallback
+  api/           Server-side STT, conversation, and simulated clinic-intake API
 packages/
   speech/        Provider-neutral speech contracts and file-STT adapters
   conversation/  Conversation and interpretation contracts
@@ -55,7 +55,7 @@ pnpm check
 
 The web shell defaults to `http://localhost:5173`; the API defaults to `http://127.0.0.1:3000`. Copy `.env.example` to `.env` only when local overrides are needed.
 
-To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and start both applications with `pnpm dev`. Open `http://localhost:5173`, activate the microphone button, stop recording, review or correct the visible transcript, and continue. The API reads the root `.env` in local development; the key is never exposed through Vite or sent to the browser. Text entry remains available. The prototype recognizes a deliberately small set of English, Nigerian Pidgin, and English/Yoruba code-switch phrases. Do not speak or type real financial or authentication data.
+To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and start both applications with `pnpm dev`. Open `http://localhost:5173`, activate the microphone button, stop recording, review or correct the visible transcript, and continue. The API reads the root `.env` in local development; the key is never exposed through Vite or sent to the browser. Text entry remains available. The prototype recognizes a deliberately small set of Yoruba, Nigerian English, Pidgin, and Yoruba-English code-switched phrases. Use invented health scenarios only; do not speak or type real health information or identifiers.
 
 ## Documentation
 
@@ -64,6 +64,7 @@ To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and s
 - [MVP boundaries](docs/mvp-boundaries.md)
 - [Architecture](docs/architecture.md)
 - [Voice-first product flow](docs/voice-product-flow.md)
+- [Healthcare intake vertical](docs/healthcare-intake.md)
 - [Benchmark methodology](docs/benchmark-methodology.md)
 - [Batch STT benchmark runner](docs/stt-batch-runner.md)
 - [STT metric aggregation](docs/stt-metrics.md)
@@ -75,13 +76,13 @@ To use voice locally, copy `.env.example` to `.env`, set `INTRON_API_KEY`, and s
 - [Deepgram STT adapter](docs/providers/deepgram-stt.md)
 - [Responsible AI](docs/responsible-ai.md)
 - [Open decisions](docs/open-decisions.md)
-- [Financial-support vertical](docs/vertical-financial-support.md)
+- [Preserved financial-support vertical](docs/vertical-financial-support.md)
 
 ## Data and secrets
 
 Do not commit credentials, raw participant audio, direct identifiers, consent evidence, or generated evaluation results that may contain personal data. The audio, result, and private-metadata paths are ignored by default. Metadata intended for version control must be de-identified and reviewed first.
 
-The synthetic fixture layer contains 36 Yoruba-first text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. Those fixtures contain no audio, provider output, scores, or fabricated metrics; their Yoruba and Nigerian-language annotations require qualified speaker review before benchmark use.
+The active synthetic fixture layer contains 16 healthcare-intake text fixtures across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English slices. The earlier 36 failed-transfer fixtures remain preserved separately. These fixtures contain no audio, provider output, scores, real patient information, or fabricated metrics; their language and clinical-safety annotations require qualified review before benchmark use.
 
 The official `intronhealth/AfriSwitch` Yoruba `test` split is configured as the primary external code-switching ASR source. Project Bridge v0.1 freezes its first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; the Hugging Face revision remains unresolved until the first materialization run. No dataset audio is committed or downloaded by normal checks. The opt-in preparation script downloads only the selected clips and writes a checksummed local manifest; see the [dataset guide](docs/datasets/afriswitch-yoruba.md). AfriSwitch results must remain identified separately from Project Bridge's synthetic and domain-specific samples.
 
@@ -101,4 +102,4 @@ The commands require their respective API keys; read the provider guides before 
 
 ## Current vertical
 
-The challenge MVP vertical is financial-service support, limited to creating a simulated support case for a failed or pending transfer. Generic speech, conversation, action, and benchmark contracts remain reusable across domains.
+The challenge MVP vertical is healthcare intake/navigation, limited to creating a confirmed simulated clinic intake or stopping at a conservative emergency-escalation boundary. It provides no diagnosis, treatment, prescription, appointment, or real clinical action. Generic speech, conversation, action, and benchmark contracts remain reusable across domains, and the earlier financial-support domain remains in the repository as inactive prior work.

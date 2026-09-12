@@ -100,7 +100,7 @@ These are separate result objects rather than aliases for “accuracy”:
 
 A successful transcript does not imply semantic correctness or task completion.
 
-AfriSwitch is used primarily for WER, future CER, failure, and latency analysis. Its general conversational rows receive no fabricated financial intent, entity, action, or downstream task labels. Those evaluations remain on separately identified Project Bridge domain fixtures and recordings.
+AfriSwitch is used primarily for WER, CER, failure, and latency analysis. Its general conversational rows receive no fabricated healthcare intent, symptom, urgency, action, or downstream task labels. Those evaluations remain on separately identified Project Bridge domain fixtures and recordings.
 
 ## Analysis and reporting
 

@@ -42,12 +42,16 @@ interface Proposal {
 }
 
 interface ApiReply {
-  state: "awaiting-input" | "awaiting-confirmation" | "case-created";
+  state:
+    | "awaiting-input"
+    | "awaiting-confirmation"
+    | "emergency-escalation"
+    | "intake-created";
   conversationId: string;
   revision: number;
   assistantMessage: string;
   proposal?: Proposal;
-  caseReference?: string;
+  intakeReference?: string;
 }
 
 interface ApiErrorBody {
@@ -63,6 +67,7 @@ type ProductState =
   | "submitting-utterance"
   | "clarification"
   | "confirmation"
+  | "emergency-escalation"
   | "completed"
   | "error";
 
@@ -261,9 +266,14 @@ function applyReply(reply: ApiReply): void {
     setProductState(reply.revision === 0 ? "idle" : "clarification");
   } else if (reply.state === "awaiting-confirmation") {
     setProductState("confirmation");
+  } else if (reply.state === "emergency-escalation") {
+    setProductState("emergency-escalation");
+    status.textContent = "No routine clinic intake was created.";
+    status.className = "status error";
+    status.setAttribute("role", "alert");
   } else {
     setProductState("completed");
-    status.textContent = `Support case reference: ${reply.caseReference ?? "unavailable"}`;
+    status.textContent = `Simulated clinic intake reference: ${reply.intakeReference ?? "unavailable"}`;
     status.className = "status success";
   }
 }
@@ -337,7 +347,7 @@ recordAgainButton.addEventListener("click", () => {
 
 confirmButton.addEventListener("click", () => {
   if (!conversationId || !currentProposal || interactionBusy) return;
-  setBusy(true, "Creating the simulated support case…");
+  setBusy(true, "Creating the simulated clinic intake request…");
   void request<ApiReply>(
     `/conversations/${encodeURIComponent(conversationId)}/confirmations`,
     {

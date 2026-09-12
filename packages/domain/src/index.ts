@@ -18,6 +18,8 @@ import type {
   JsonValue,
 } from "@project-bridge/shared";
 
+export * from "./healthcare-intake.js";
+
 export interface DomainModule {
   readonly id: string;
   readonly displayName: string;

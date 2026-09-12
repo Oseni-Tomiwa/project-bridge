@@ -68,7 +68,7 @@ function harness(
   const transcribe = vi.fn(
     options.transcribe ??
       (async () => ({
-        transcript: "I sent 25k yesterday",
+        transcript: "I have had a headache since yesterday",
         provider: "intron-sahara",
         latencyMs: 25,
       })),
@@ -175,15 +175,17 @@ describe("voice recorder web flow", () => {
     await finishRecording(created);
 
     expect(created.controller.snapshot.rawTranscript).toBe(
-      "I sent 25k yesterday",
+      "I have had a headache since yesterday",
     );
-    created.controller.updateTranscript("I sent 25k yesterday to my brother");
+    created.controller.updateTranscript(
+      "I have had a headache since yesterday and want to see a clinician",
+    );
 
     expect(created.controller.snapshot.rawTranscript).toBe(
-      "I sent 25k yesterday",
+      "I have had a headache since yesterday",
     );
     expect(created.controller.transcriptForSubmission()).toBe(
-      "I sent 25k yesterday to my brother",
+      "I have had a headache since yesterday and want to see a clinician",
     );
   });
 
@@ -254,6 +256,9 @@ describe("voice recorder web flow", () => {
     );
     expect(html).toContain("Prefer to type instead?");
     expect(html).toContain('id="utterance-form"');
-    expect(html).toContain('aria-label="Start recording your transfer issue"');
+    expect(html).toContain(
+      'aria-label="Start recording your clinic intake request"',
+    );
+    expect(html).toContain("This is a simulation, not medical advice.");
   });
 });
