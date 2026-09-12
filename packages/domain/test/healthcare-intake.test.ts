@@ -168,6 +168,7 @@ describe("healthcare-intake journey", () => {
       urgencySignals: [],
     });
     expect(proposalReply.proposal.summary).toContain("not a diagnosis");
+    expect(proposalReply.proposal.summary).not.toContain("doctor..");
 
     const completed = await service.confirm(
       started.conversationId,

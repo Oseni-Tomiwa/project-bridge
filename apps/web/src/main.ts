@@ -20,7 +20,9 @@ const proposalSummary =
   requiredElement<HTMLParagraphElement>("proposal-summary");
 const confirmButton = requiredElement<HTMLButtonElement>("confirm");
 const status = requiredElement<HTMLParagraphElement>("status");
+const flowState = requiredElement<HTMLParagraphElement>("flow-state");
 const voicePanel = requiredElement<HTMLElement>("voice-panel");
+const voiceHeading = requiredElement<HTMLHeadingElement>("voice-heading");
 const voiceState = requiredElement<HTMLParagraphElement>("voice-state");
 const recordButton = requiredElement<HTMLButtonElement>("record");
 const recordingControls = requiredElement<HTMLDivElement>("recording-controls");
@@ -34,6 +36,7 @@ const continueButton = requiredElement<HTMLButtonElement>(
   "continue-transcript",
 );
 const recordAgainButton = requiredElement<HTMLButtonElement>("record-again");
+const utteranceLabel = requiredElement<HTMLLabelElement>("utterance-label");
 
 interface Proposal {
   id: string;
@@ -52,6 +55,7 @@ interface ApiReply {
   assistantMessage: string;
   proposal?: Proposal;
   intakeReference?: string;
+  missingFields?: readonly string[];
 }
 
 interface ApiErrorBody {
@@ -90,7 +94,7 @@ function setProductState(next: ProductState): void {
   document.documentElement.dataset.productState = productState;
 }
 
-function addTurn(role: "You" | "Bridge", text: string): void {
+function addTurn(role: "You" | "Bridge", text: string, scroll = true): void {
   const item = document.createElement("li");
   item.className = role === "You" ? "turn user" : "turn assistant";
   const label = document.createElement("strong");
@@ -99,7 +103,7 @@ function addTurn(role: "You" | "Bridge", text: string): void {
   message.textContent = text;
   item.append(label, message);
   history.append(item);
-  item.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  if (scroll) item.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 async function request<ResponseBody>(
@@ -114,14 +118,14 @@ async function request<ResponseBody>(
     });
   } catch {
     throw new Error(
-      "The Project Bridge API is unavailable. Check the local server and try again.",
+      "The demo service is unavailable. Restart the demo and try again.",
     );
   }
   let body: ResponseBody & ApiErrorBody;
   try {
     body = (await response.json()) as ResponseBody & ApiErrorBody;
   } catch {
-    throw new Error("The API returned an unreadable response. Try again.");
+    throw new Error("The demo could not read the response. Try again.");
   }
   if (!response.ok) {
     throw new Error(
@@ -256,7 +260,7 @@ function renderVoice(snapshot: VoiceRecorderSnapshot): void {
 
 function applyReply(reply: ApiReply): void {
   conversationId = reply.conversationId;
-  addTurn("Bridge", reply.assistantMessage);
+  addTurn("Bridge", reply.assistantMessage, reply.revision > 0);
   currentProposal = reply.proposal;
   confirmation.hidden = reply.state !== "awaiting-confirmation";
   interaction.hidden = reply.state !== "awaiting-input";
@@ -264,15 +268,40 @@ function applyReply(reply: ApiReply): void {
 
   if (reply.state === "awaiting-input") {
     setProductState(reply.revision === 0 ? "idle" : "clarification");
+    const askingForName =
+      reply.missingFields?.includes("preferredName") === true;
+    flowState.textContent = askingForName
+      ? "Optional name"
+      : reply.revision === 0
+        ? "Ready for your concern"
+        : "Clarification needed";
+    voiceHeading.textContent = askingForName
+      ? "Say what we should call you—or say skip"
+      : reply.revision === 0
+        ? "Tell us your health concern"
+        : "Reply to continue your intake";
+    utteranceLabel.textContent = askingForName
+      ? "First name, nickname, or “skip”"
+      : reply.revision === 0
+        ? "What should the clinic know?"
+        : "Your answer";
+    textarea.placeholder = askingForName
+      ? "Example: Tomiwa, Big Tee, or skip"
+      : reply.revision === 0
+        ? "Example: Mo ti ni headache lati ana and my body dey hot. I want see doctor."
+        : "Type your answer here";
   } else if (reply.state === "awaiting-confirmation") {
     setProductState("confirmation");
+    flowState.textContent = "Confirmation required";
   } else if (reply.state === "emergency-escalation") {
     setProductState("emergency-escalation");
+    flowState.textContent = "Emergency guidance";
     status.textContent = "No routine clinic intake was created.";
     status.className = "status error";
     status.setAttribute("role", "alert");
   } else {
     setProductState("completed");
+    flowState.textContent = "Simulated intake created";
     status.textContent = `Simulated clinic intake reference: ${reply.intakeReference ?? "unavailable"}`;
     status.className = "status success";
   }
@@ -392,6 +421,7 @@ function showError(error: unknown): void {
     error instanceof Error ? error.message : "Something went wrong. Try again.";
   status.className = "status error";
   status.setAttribute("role", "alert");
+  flowState.textContent = "Needs attention";
   if (!interaction.hidden) textarea.focus();
 }
 
