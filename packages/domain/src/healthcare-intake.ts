@@ -40,6 +40,7 @@ export interface HealthcareIntakeFields {
   readonly reportedSymptoms: readonly string[];
   readonly duration?: string;
   readonly requestedService?: string;
+  readonly preferredName?: string;
   readonly urgencySignals: readonly UrgencySignal[];
   readonly language: Readonly<{
     mix: HealthcareLanguageMix;
@@ -130,6 +131,7 @@ export type HealthcareIntakeReply =
         | "reportedConcern"
         | "duration"
         | "requestedService"
+        | "preferredName"
       )[];
     }
   | {
@@ -237,6 +239,34 @@ function extractRequestedService(text: string): string | undefined {
     : undefined;
 }
 
+const preferredNamePattern =
+  /^[\p{L}\p{M}][\p{L}\p{M}'’-]*(?:\s+[\p{L}\p{M}][\p{L}\p{M}'’-]*){0,2}$/u;
+const preferredNamePrompt =
+  "Before I prepare your intake, what should I call you? You can give me just your first name or a nickname, or say skip.";
+
+function extractExplicitPreferredName(text: string): string | undefined {
+  const match = text.match(
+    /\b(?:my name is|call me|you can call me)\s+([\p{L}\p{M}][\p{L}\p{M}'’-]*(?:\s+(?!and\b)[\p{L}\p{M}][\p{L}\p{M}'’-]*){0,2})(?=\s*(?:[,.!?]|$|\band\b))/iu,
+  );
+  return match?.[1];
+}
+
+function extractPreferredNameAnswer(text: string): string | undefined {
+  const candidate = text
+    .trim()
+    .replace(/[,.!?]+$/u, "")
+    .trim();
+  return candidate.length <= 50 && preferredNamePattern.test(candidate)
+    ? candidate
+    : undefined;
+}
+
+function declinesPreferredName(text: string): boolean {
+  return /^(?:skip|no(?: name)?|i(?:'d| would) rather not say|(?:i )?(?:would )?prefer not to say|rather not say|don'?t want to say|jẹ́ ká má lo orúkọ)[.!]?$/iu.test(
+    text.trim(),
+  );
+}
+
 function inferLanguageMix(text: string): HealthcareLanguageMix {
   const yoruba = /\b(?:mo|mi|lati|ana|dokita|ori|inu|aya|gbona|ko ji)\b/iu.test(
     text,
@@ -275,11 +305,13 @@ function requestsClinicalAdvice(text: string): boolean {
 function fieldsFromText(text: string): HealthcareIntakeFields {
   const duration = extractDuration(text);
   const requestedService = extractRequestedService(text);
+  const preferredName = extractExplicitPreferredName(text);
   return {
     reportedConcern: cleanedConcern(text),
     reportedSymptoms: extractSymptoms(text),
     ...(duration === undefined ? {} : { duration }),
     ...(requestedService === undefined ? {} : { requestedService }),
+    ...(preferredName === undefined ? {} : { preferredName }),
     urgencySignals: detectEmergencySignals(text),
     language: {
       mix: inferLanguageMix(text),
@@ -322,6 +354,10 @@ function mergeFields(
           requestedService:
             additions.requestedService ?? existing.requestedService,
         }),
+    ...(additions.preferredName === undefined &&
+    existing.preferredName === undefined
+      ? {}
+      : { preferredName: additions.preferredName ?? existing.preferredName }),
     urgencySignals: [
       ...new Set([...existing.urgencySignals, ...additions.urgencySignals]),
     ],
@@ -396,6 +432,10 @@ export class DeterministicHealthcareIntakeInterpreter
       };
     }
     let fields = mergeFields(existing, utterance.text);
+    const wasAskedForPreferredName = hasAsked(
+      state,
+      "Before I prepare your intake, what should I call you?",
+    );
     if (
       fields.requestedService === undefined &&
       hasAsked(state, "Would you like this simulated request") &&
@@ -403,7 +443,15 @@ export class DeterministicHealthcareIntakeInterpreter
     ) {
       fields = { ...fields, requestedService: "see a clinician" };
     }
-    const entities = entitiesFromFields(fields);
+    if (
+      fields.preferredName === undefined &&
+      wasAskedForPreferredName &&
+      !declinesPreferredName(utterance.text)
+    ) {
+      const preferredName = extractPreferredNameAnswer(utterance.text);
+      if (preferredName !== undefined) fields = { ...fields, preferredName };
+    }
+    let entities = entitiesFromFields(fields);
     if (fields.reportedConcern === "") {
       return clarification(
         "What health concern would you like the clinic to know about?",
@@ -429,6 +477,10 @@ export class DeterministicHealthcareIntakeInterpreter
         entities,
       );
     }
+    if (fields.preferredName === undefined && !wasAskedForPreferredName) {
+      return clarification(preferredNamePrompt, ["preferredName"], entities);
+    }
+    entities = entitiesFromFields(fields);
     return {
       kind: "action-proposed",
       intent: { name: CLINIC_INTAKE_INTENT },
@@ -613,6 +665,7 @@ export class HealthcareIntakeService {
           | "reportedConcern"
           | "duration"
           | "requestedService"
+          | "preferredName"
         )[],
       };
     }
@@ -632,7 +685,19 @@ export class HealthcareIntakeService {
       fields,
     };
     conversation.proposal = proposal;
-    const assistantMessage = `${summary} Do you confirm that I should create this simulated clinic intake request?`;
+    const latestUserText = text.trim();
+    const nameAcknowledgement =
+      fields.preferredName === undefined
+        ? declinesPreferredName(latestUserText)
+          ? "That's okay. I can create the simulated intake without a name. "
+          : ""
+        : hasAsked(
+              conversation,
+              "Before I prepare your intake, what should I call you?",
+            )
+          ? `Thanks, ${fields.preferredName}. `
+          : "";
+    const assistantMessage = `${nameAcknowledgement}${summary} Do you confirm that I should create this simulated clinic intake request?`;
     conversation.turns.push({
       role: "assistant",
       text: assistantMessage,
@@ -860,6 +925,9 @@ function fieldsToActionInput(
     ...(fields.requestedService === undefined
       ? {}
       : { requestedService: fields.requestedService }),
+    ...(fields.preferredName === undefined
+      ? {}
+      : { preferredName: fields.preferredName }),
     urgencySignals: [...fields.urgencySignals],
     language: { ...fields.language },
   };
@@ -901,7 +969,9 @@ function parseHealthcareActionInput(
     typeof language !== "object" ||
     typeof language.mix !== "string" ||
     !languageMixes.has(language.mix as HealthcareLanguageMix) ||
-    language.basis !== "deterministic-text-signals"
+    language.basis !== "deterministic-text-signals" ||
+    (input.preferredName !== undefined &&
+      !isValidPreferredName(input.preferredName))
   ) {
     return undefined;
   }
@@ -912,10 +982,19 @@ function parseHealthcareActionInput(
     ...(typeof input.requestedService === "string"
       ? { requestedService: input.requestedService }
       : {}),
+    ...(isValidPreferredName(input.preferredName)
+      ? { preferredName: input.preferredName }
+      : {}),
     urgencySignals: urgency as UrgencySignal[],
     language: {
       mix: language.mix as HealthcareLanguageMix,
       basis: "deterministic-text-signals",
     },
   };
+}
+
+function isValidPreferredName(value: JsonValue | undefined): value is string {
+  if (value === undefined) return false;
+  if (typeof value !== "string" || value.length > 50) return false;
+  return preferredNamePattern.test(value);
 }

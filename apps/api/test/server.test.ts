@@ -54,8 +54,19 @@ describe("healthcare-intake API", () => {
         }),
       },
     );
-    expect(utterance.body.state).toBe("awaiting-confirmation");
-    const proposal = utterance.body.proposal as {
+    expect(utterance.body).toMatchObject({
+      state: "awaiting-input",
+      missingFields: ["preferredName"],
+    });
+    const named = await client.request(
+      `/conversations/${conversationId}/utterances`,
+      {
+        method: "POST",
+        body: JSON.stringify({ text: "Tomiwa" }),
+      },
+    );
+    expect(named.body.state).toBe("awaiting-confirmation");
+    const proposal = named.body.proposal as {
       id: string;
       conversationRevision: number;
     };
@@ -83,6 +94,7 @@ describe("healthcare-intake API", () => {
       simulated: true,
       intent: "clinic_intake_request",
       conversationId,
+      fields: { preferredName: "Tomiwa" },
     });
   });
 

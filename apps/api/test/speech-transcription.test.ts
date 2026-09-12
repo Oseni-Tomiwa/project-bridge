@@ -194,9 +194,17 @@ describe("product speech transcription boundary", () => {
         "How long have you had these symptoms? You can say you are not sure.",
     });
 
-    const confirmation = await service.submitUtterance(
+    const namePrompt = await service.submitUtterance(
       started.conversationId,
       "since yesterday",
+    );
+    expect(namePrompt).toMatchObject({
+      state: "awaiting-input",
+      missingFields: ["preferredName"],
+    });
+    const confirmation = await service.submitUtterance(
+      started.conversationId,
+      "skip",
     );
     expect(confirmation.state).toBe("awaiting-confirmation");
   });

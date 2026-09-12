@@ -13,14 +13,17 @@ voice or typed text
 → user-reviewed canonical transcript
 → deterministic clinic_intake_request interpretation
 → conservative emergency-language check
-→ one clarification when needed
+→ necessary health-intake clarification when needed
+→ optional preferred-name question, if not already answered
 → summary of only the user's reported information
 → explicit confirmation bound to proposal/revision/fingerprint
 → idempotent simulated in-memory clinic intake
 → BRG-H-<year>-<opaque> reference
 ```
 
-The structured fields are `reportedConcern`, `reportedSymptoms`, optional `duration`, optional `requestedService`, `urgencySignals`, deterministic language/code-switch metadata, and confirmation evidence. Symptom labels only normalize phrases the user actually stated. For example, “my body dey hot” may be represented as “feeling hot”; it must not become a diagnosis or an inferred cause.
+The structured fields are `reportedConcern`, `reportedSymptoms`, optional `duration`, optional `requestedService`, optional `preferredName`, `urgencySignals`, deterministic language/code-switch metadata, and confirmation evidence. `preferredName` is only a first name, nickname, or other short name the user chooses to be called; it is not a verified or inferred identity and is not required for task success. Symptom labels only normalize phrases the user actually stated. For example, “my body dey hot” may be represented as “feeling hot”; it must not become a diagnosis or an inferred cause.
+
+For a non-emergency request, Bridge first understands the concern and completes necessary intake clarification. It then asks, “Before I prepare your intake, what should I call you? You can give me just your first name or a nickname, or say skip.” A refusal such as “skip” or “I’d rather not say” resolves the optional step without blocking the proposal or intake. If the user already explicitly supplied a preferred name, Bridge does not ask again. Emergency escalation always takes precedence over this question.
 
 The action succeeds only when the reported concern is sufficient, an emergency escalation is not active, no unnecessary identifier has been accepted, the exact proposal has been explicitly confirmed, and one simulated intake record has been created. The completion message says that no appointment was booked and no clinic was contacted.
 
@@ -40,7 +43,9 @@ When detected, the routine intake path stops, creates no proposal or intake, and
 
 Health text is sensitive information even without a name. Product audio remains in browser memory and API/provider request scope and is not stored by Project Bridge. The prototype holds the user-approved text only in process-local conversation/intake memory and does not log it intentionally. A production system would require notice, lawful basis, access control, encryption, retention/deletion rules, processor review, audit policy, and incident response.
 
-The prototype does not need a national ID, insurance number, medical-record number, patient account, or payment credential. Obvious occurrences are rejected before the text enters conversation state, but this small detector is defense in depth—not production data-loss prevention—and cannot stop sensitive words in audio from reaching the configured transcription provider.
+The prototype applies minimal-data collection: it asks only for an optional preferred name in addition to health information needed for the simulated intake. It does not request a full legal name, date of birth, home address, national ID, insurance number, medical-record number, patient account, full phone number, or payment credential. Obvious occurrences covered by the existing detector are rejected before the text enters conversation state, but this small detector is defense in depth—not production data-loss prevention—and cannot stop sensitive words in audio from reaching the configured transcription provider.
+
+The preferred name is optional personal data. It remains only in process-local conversation, proposal, and simulated intake state. It is not independently logged, used to infer a full identity, requested again after receipt, or included in current speech/downstream benchmark scoring. Emergency escalation takes priority over collecting it.
 
 ## Example conversations
 
@@ -48,7 +53,11 @@ Normal path:
 
 > User: Mo ti ni headache lati ana and my body dey hot. I want see doctor.
 >
-> Bridge: You reported: … Symptoms you reported: headache, feeling hot. Duration you reported: lati ana. Requested service: see a clinician. This summarizes your words and is not a diagnosis. Do you confirm that I should create this simulated clinic intake request?
+> Bridge: Before I prepare your intake, what should I call you? You can give me just your first name or a nickname, or say skip.
+>
+> User: Tomiwa.
+>
+> Bridge: Thanks, Tomiwa. You reported: … Symptoms you reported: headache, feeling hot. Duration you reported: lati ana. Requested service: see a clinician. This summarizes your words and is not a diagnosis. Do you confirm that I should create this simulated clinic intake request?
 >
 > User: Yes.
 >

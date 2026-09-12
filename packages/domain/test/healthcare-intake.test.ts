@@ -55,8 +55,9 @@ describe("deterministic healthcare-intake interpretation", () => {
     async (_label, utterance) => {
       const result = await interpret(utterance);
       expect(result).toMatchObject({
-        kind: "action-proposed",
+        kind: "clarification-required",
         intent: { name: "clinic_intake_request" },
+        missingEntities: ["preferredName"],
       });
       expect(JSON.stringify(result)).not.toMatch(
         /heart attack|malaria|diagnosis|prescription/iu,
@@ -69,7 +70,8 @@ describe("deterministic healthcare-intake interpretation", () => {
       "Mo ti ni headache lati ana and my body dey hot. I want see doctor.",
     );
     expect(result).toMatchObject({
-      kind: "action-proposed",
+      kind: "clarification-required",
+      missingEntities: ["preferredName"],
       entities: expect.arrayContaining([
         { name: "reportedSymptoms", value: ["headache", "feeling hot"] },
         { name: "duration", value: "lati ana" },
@@ -122,7 +124,8 @@ describe("deterministic healthcare-intake interpretation", () => {
     await expect(
       interpret("Orí mi ń dun lati ana, body mi dey hot and I wan see doctor."),
     ).resolves.toMatchObject({
-      kind: "action-proposed",
+      kind: "clarification-required",
+      missingEntities: ["preferredName"],
       entities: expect.arrayContaining([
         { name: "reportedSymptoms", value: ["headache", "feeling hot"] },
       ]),
@@ -143,9 +146,17 @@ describe("healthcare-intake journey", () => {
       missingFields: ["duration"],
     });
 
-    const proposalReply = await service.submitUtterance(
+    const namePrompt = await service.submitUtterance(
       started.conversationId,
       "Since yesterday.",
+    );
+    expect(namePrompt).toMatchObject({
+      state: "awaiting-input",
+      missingFields: ["preferredName"],
+    });
+    const proposalReply = await service.submitUtterance(
+      started.conversationId,
+      "Tomiwa.",
     );
     expect(proposalReply.state).toBe("awaiting-confirmation");
     if (proposalReply.state !== "awaiting-confirmation") return;
@@ -153,6 +164,7 @@ describe("healthcare-intake journey", () => {
       reportedSymptoms: ["headache", "feeling hot"],
       duration: "since yesterday",
       requestedService: "see a clinician",
+      preferredName: "Tomiwa",
       urgencySignals: [],
     });
     expect(proposalReply.proposal.summary).toContain("not a diagnosis");
@@ -172,6 +184,7 @@ describe("healthcare-intake journey", () => {
     ).resolves.toMatchObject({
       intent: "clinic_intake_request",
       simulated: true,
+      fields: { preferredName: "Tomiwa" },
       confirmation: {
         state: "confirmed",
         conversationRevision: proposalReply.proposal.conversationRevision,
@@ -195,7 +208,10 @@ describe("healthcare-intake journey", () => {
       started.conversationId,
       "I want to see a clinician.",
     );
-    expect(next.state).toBe("awaiting-confirmation");
+    expect(next).toMatchObject({
+      state: "awaiting-input",
+      missingFields: ["preferredName"],
+    });
   });
 
   it("escalates emergency language and blocks routine intake creation", async () => {
@@ -216,6 +232,7 @@ describe("healthcare-intake journey", () => {
     expect(response.assistantMessage).not.toMatch(
       /heart attack|stroke|take (?:a|this) medicine/iu,
     );
+    expect(response.assistantMessage).not.toMatch(/what should I call you/iu);
     await expect(
       service.confirm(started.conversationId, "anything", 1),
     ).rejects.toMatchObject({ code: "emergency-intake-blocked" });
@@ -241,38 +258,110 @@ describe("healthcare-intake journey", () => {
       "I have headache since yesterday and want to see a clinician.",
     );
     expect(next).toMatchObject({
-      state: "awaiting-confirmation",
+      state: "awaiting-input",
       revision: 1,
+      missingFields: ["preferredName"],
     });
   });
 
   it("keeps confirmation bound and execution idempotent", async () => {
     const { service } = harness();
     const started = service.startConversation();
-    const reply = await service.submitUtterance(
+    const proposalReply = await service.submitUtterance(
       started.conversationId,
-      "I have headache since yesterday and want to see a clinician.",
+      "Call me Ada. I have headache since yesterday and want to see a clinician.",
     );
-    if (reply.state !== "awaiting-confirmation")
+    if (proposalReply.state !== "awaiting-confirmation")
       throw new Error("Expected healthcare proposal.");
     await expect(
       service.confirm(
         started.conversationId,
         "stale-proposal",
-        reply.proposal.conversationRevision,
+        proposalReply.proposal.conversationRevision,
       ),
     ).rejects.toMatchObject({ code: "stale-confirmation" });
     await service.confirm(
       started.conversationId,
-      reply.proposal.id,
-      reply.proposal.conversationRevision,
+      proposalReply.proposal.id,
+      proposalReply.proposal.conversationRevision,
     );
     await expect(
       service.confirm(
         started.conversationId,
-        reply.proposal.id,
-        reply.proposal.conversationRevision,
+        proposalReply.proposal.id,
+        proposalReply.proposal.conversationRevision,
       ),
     ).rejects.toMatchObject({ code: "already-executed" });
   });
+
+  it("accepts an explicitly supplied preferred name without asking again", async () => {
+    const { service } = harness();
+    const started = service.startConversation();
+    const reply = await service.submitUtterance(
+      started.conversationId,
+      "Call me Tomiwa. I have headache since yesterday and want to see a clinician.",
+    );
+    expect(reply).toMatchObject({
+      state: "awaiting-confirmation",
+      proposal: { fields: { preferredName: "Tomiwa" } },
+    });
+  });
+
+  it("accepts a nickname after the optional name prompt", async () => {
+    const { service } = harness();
+    const started = service.startConversation();
+    const prompt = await service.submitUtterance(
+      started.conversationId,
+      "I have headache since yesterday and want to see a clinician.",
+    );
+    expect(prompt).toMatchObject({
+      state: "awaiting-input",
+      missingFields: ["preferredName"],
+    });
+    expect(prompt.assistantMessage).toContain("first name or a nickname");
+    expect(prompt.assistantMessage).not.toMatch(
+      /full legal name|date of birth|home address|phone number|account identifier/iu,
+    );
+
+    const reply = await service.submitUtterance(
+      started.conversationId,
+      "Big Tee",
+    );
+    expect(reply).toMatchObject({
+      state: "awaiting-confirmation",
+      proposal: { fields: { preferredName: "Big Tee" } },
+    });
+    expect(reply.assistantMessage).toContain("Thanks, Big Tee.");
+  });
+
+  it.each(["skip", "I'd rather not say"])(
+    "allows the user to omit a name with %s and still complete",
+    async (refusal) => {
+      const { service } = harness();
+      const started = service.startConversation();
+      await service.submitUtterance(
+        started.conversationId,
+        "I have headache since yesterday and want to see a clinician.",
+      );
+      const proposal = await service.submitUtterance(
+        started.conversationId,
+        refusal,
+      );
+      expect(proposal.state).toBe("awaiting-confirmation");
+      if (proposal.state !== "awaiting-confirmation") return;
+      expect(proposal.proposal.fields.preferredName).toBeUndefined();
+      expect(proposal.assistantMessage).toContain(
+        "That's okay. I can create the simulated intake without a name.",
+      );
+      const completed = await service.confirm(
+        started.conversationId,
+        proposal.proposal.id,
+        proposal.proposal.conversationRevision,
+      );
+      expect(completed.state).toBe("intake-created");
+      if (completed.state !== "intake-created") return;
+      const intake = await service.getIntake(completed.intakeReference);
+      expect(intake.fields.preferredName).toBeUndefined();
+    },
+  );
 });

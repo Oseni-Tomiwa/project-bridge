@@ -260,5 +260,7 @@ describe("voice recorder web flow", () => {
       'aria-label="Start recording your clinic intake request"',
     );
     expect(html).toContain("This is a simulation, not medical advice.");
+    expect(html).toContain("optional first name or nickname");
+    expect(html).toContain("you can skip it");
   });
 });
