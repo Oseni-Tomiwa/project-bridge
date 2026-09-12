@@ -28,6 +28,7 @@ Do not recruit or record minors or vulnerable participants until appropriate saf
 - Define retention and deletion before collection, including backups and provider-side retention.
 - Review provider terms for training use, subprocessors, regions, and deletion controls before sending participant data.
 - Redact or avoid collecting credentials, identifiers, and health details that are unnecessary for the stated intake purpose. Treat even relevant health text as sensitive.
+- Apply data minimization to conversational identity: the active intake may ask once for an optional first name, nickname, or other preferred form of address only after the health need is understood. The user may skip it without affecting task completion. Do not request a full legal name, date of birth, address, phone number, national ID, insurance number, medical-record number, or account identifier.
 
 ## Safety controls
 
@@ -40,6 +41,8 @@ High-risk verticals need domain-specific review, escalation paths, and regulator
 The active healthcare slice only creates a process-local simulated clinic intake after explicit confirmation. It does not diagnose, triage comprehensively, recommend treatment, prescribe, access a medical record, contact a clinic, book an appointment, or replace professional care. The prior financial-support code remains present but is not the active API workflow.
 
 The deterministic emergency boundary is intentionally narrow. It reacts to explicit inability to breathe, unconscious/not-waking language, severe uncontrolled bleeding, active seizure, or explicit immediate life-threatening wording by blocking routine intake and advising immediate local emergency or urgent assistance. It must not be represented as comprehensive medical triage; clinical owners must review its phrases, false-negative risk, accessibility, jurisdiction-specific destinations, and emergency numbers before real use.
+
+Emergency escalation precedes the optional preferred-name step. Bridge must never delay an emergency response to ask how the user wants to be addressed. A provided preferred name is unverified optional personal data, remains process-local with the simulated intake state, is not used to infer identity, and is outside current speech benchmark scoring.
 
 Microphone permission is requested only after the user activates recording. The UI warns that health information is sensitive, exposes the raw transcript for review, and requires Continue before the transcript becomes an utterance. Text remains available if voice is unsupported or permission is denied.
 
