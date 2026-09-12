@@ -5,7 +5,8 @@ Nothing in this list is selected unless moved to a dated decision record.
 ## Product
 
 - Final product/brand name
-- Target user segment within financial-service support and accessibility research plan
+- Target user segment within healthcare intake/navigation and the accessibility research plan
+- Which clinic-navigation context, if any, should follow the simulation after clinical, legal, privacy, and operational review
 - Initial countries, language pairs, code-switch patterns, and accessibility needs
 - Voice-first usability findings and whether any later experience should be voice-only
 - Success criteria for user value and task completion
@@ -53,20 +54,24 @@ Nothing in this list is selected unless moved to a dated decision record.
 - Allowed-use vocabulary and systems of record for consent, licensing, and retention evidence
 - Definition of “transcription accuracy” in addition to WER
 - Task-completion rubric and safety error taxonomy
+- Qualified review protocol for reported-concern preservation, symptom-phrase annotations, and unsafe clinical inference
+- Whether and how AfriSwitchCare may be used as a separately governed healthcare-speech robustness set without conflating it with AfriSwitch or downstream ground truth
 - Canonical action-input fingerprint algorithm and confirmation expiry policy
 
 ## Architecture and operations
 
 - Deployment provider and region(s)
 - Authentication and authorization approach
-- Whether support-case persistence is required beyond the current process-local in-memory repository; if so, database and retention design
+- Whether clinic-intake persistence is ever required beyond the current process-local simulation; if so, health-data access, encryption, audit, and retention design
 - Observability, cost controls, queueing, and provider failover
 - API/channel protocol and streaming requirements
 - Browser/container compatibility targets and whether one shared, versioned transcoding path is required
 
 ## Responsible AI and governance
 
-- Risk tier of the selected action and confirmation requirements
+- Clinical safety owner, risk classification, intended-use statement, and confirmation requirements
+- Jurisdiction-specific emergency wording, local destinations/numbers, false-negative testing, and human escalation ownership
+- Whether the prototype should accept any real health information; the current decision is synthetic demonstration only
 - Applicable countries, laws, regulatory obligations, and review owners
 - Data retention/deletion periods and third-party training opt-outs
 - Human review, escalation, incident response, and user redress

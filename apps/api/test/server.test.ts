@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  FinancialSupportService,
-  InMemorySupportCaseRepository,
+  HealthcareIntakeService,
+  InMemoryClinicIntakeRepository,
 } from "@project-bridge/domain";
 import { apiErrorResponse, dispatchApiRequest } from "../src/server.js";
 
 async function api() {
   let sequence = 0;
-  const service = new FinancialSupportService({
-    cases: new InMemorySupportCaseRepository(),
-    now: () => new Date("2026-09-05T12:00:00.000Z"),
+  const service = new HealthcareIntakeService({
+    intakes: new InMemoryClinicIntakeRepository(),
+    now: () => new Date("2026-09-12T12:00:00.000Z"),
     createId: (kind) => `${kind}-${++sequence}`,
   });
   return {
@@ -38,8 +38,8 @@ async function api() {
   };
 }
 
-describe("financial-support API", () => {
-  it("runs the happy path and reads the created case", async () => {
+describe("healthcare-intake API", () => {
+  it("runs the happy path and reads the simulated intake", async () => {
     const client = await api();
     const start = await client.request("/conversations", { method: "POST" });
     expect(start.response.status).toBe(201);
@@ -50,7 +50,7 @@ describe("financial-support API", () => {
       {
         method: "POST",
         body: JSON.stringify({
-          text: "I sent 25k yesterday to my brother, I was debited but he did not receive it.",
+          text: "I have headache since yesterday and want to see a clinician.",
         }),
       },
     );
@@ -71,17 +71,36 @@ describe("financial-support API", () => {
       },
     );
     expect(confirmation.body).toMatchObject({
-      state: "case-created",
-      caseReference: "BRG-2026-CASE-4",
+      state: "intake-created",
+      intakeReference: "BRG-H-2026-INTAKE-4",
     });
 
-    const caseResult = await client.request(
-      `/support-cases/${String(confirmation.body.caseReference)}`,
+    const intakeResult = await client.request(
+      `/clinic-intakes/${String(confirmation.body.intakeReference)}`,
     );
-    expect(caseResult.body).toMatchObject({
+    expect(intakeResult.body).toMatchObject({
       status: "created",
-      intent: "failed_transfer",
+      simulated: true,
+      intent: "clinic_intake_request",
       conversationId,
+    });
+  });
+
+  it("returns emergency escalation without creating an intake", async () => {
+    const client = await api();
+    const start = await client.request("/conversations", { method: "POST" });
+    const conversationId = String(start.body.conversationId);
+    const response = await client.request(
+      `/conversations/${conversationId}/utterances`,
+      {
+        method: "POST",
+        body: JSON.stringify({ text: "I cannot breathe" }),
+      },
+    );
+    expect(response.body).toMatchObject({
+      state: "emergency-escalation",
+      intakeCreated: false,
+      urgencySignals: ["cannot-breathe"],
     });
   });
 

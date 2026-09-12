@@ -166,6 +166,11 @@ describe("Yoruba evaluation manifest", () => {
   });
 
   it("indexes every fixture without claiming audio provenance", () => {
+    expect(yorubaFirstEvaluationManifest).toMatchObject({
+      status: "preserved-prior-domain-text-ground-truth-only",
+      domain: "financial-support-prior",
+      activeChallengeManifestId: "yoruba-healthcare-intake-v0.1",
+    });
     expect(yorubaFirstEvaluationManifest.fixtureIds).toEqual(
       yorubaFailedTransferFixtures.map(({ sampleId }) => sampleId),
     );

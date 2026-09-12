@@ -9,6 +9,7 @@ Many digital and AI services assume that a user can read and write comfortably, 
 - The system is a **voice-first AI access layer**, not a speech-to-text product.
 - The intended interaction is: speak naturally → transcribe/understand → determine intent → clarify missing information → confirm consequential actions → perform a downstream task → communicate the result, including by voice where appropriate.
 - The core must remain vertical-neutral. Domain behavior belongs behind explicit extension boundaries.
+- The active challenge demonstration is a simulated voice-first healthcare intake/navigation workflow, not diagnosis or medical advice.
 - “Project Bridge” is a temporary codename.
 
 ## Assumptions to validate
@@ -18,9 +19,11 @@ Many digital and AI services assume that a user can read and write comfortably, 
 - Short, plain-language clarification and confirmation turns can make action completion both usable and safe.
 - A focused first vertical can demonstrate the general platform without permanently coupling the architecture to that vertical.
 
-## Not yet decided
+## Active challenge vertical
 
-The first **challenge** vertical is now financial-service support, limited to a simulated failed/pending-transfer support case. This does not make the long-term product financial-services-specific.
+The first **challenge** vertical is healthcare intake: capture a user's own reported concern, clarify only what is needed, stop routine intake on narrow explicit emergency language, obtain confirmation, and create a simulated clinic-intake reference. It does not diagnose, recommend treatment, prescribe, contact a clinic, or book an appointment. The earlier financial-support implementation remains preserved as prior domain work; it is no longer the active challenge MVP.
+
+## Not yet decided
 
 The final product name, post-challenge vertical roadmap, speech competitors, hosting provider, LLM/provider, production database, initial benchmark language pairs, and target countries remain open.
 

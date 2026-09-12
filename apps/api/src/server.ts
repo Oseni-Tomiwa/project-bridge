@@ -9,6 +9,9 @@ import { pathToFileURL } from "node:url";
 import {
   FinancialSupportError,
   FinancialSupportService,
+  HealthcareIntakeError,
+  HealthcareIntakeService,
+  InMemoryClinicIntakeRepository,
   InMemorySupportCaseRepository,
 } from "@project-bridge/domain";
 import type { SpeechProvider } from "@project-bridge/speech";
@@ -31,8 +34,20 @@ export function createDefaultFinancialSupportService(): FinancialSupportService 
   });
 }
 
+export function createDefaultHealthcareIntakeService(): HealthcareIntakeService {
+  return new HealthcareIntakeService({
+    intakes: new InMemoryClinicIntakeRepository(),
+    now: () => new Date(),
+    createId(kind) {
+      return kind === "intake"
+        ? randomBytes(3).toString("hex")
+        : `${kind}-${randomUUID()}`;
+    },
+  });
+}
+
 export function createApiServer(
-  service: FinancialSupportService = createDefaultFinancialSupportService(),
+  service: HealthcareIntakeService = createDefaultHealthcareIntakeService(),
   speechProvider:
     | SpeechProvider
     | undefined = createDefaultProductSpeechProvider(),
@@ -45,7 +60,7 @@ export function createApiServer(
 async function route(
   request: IncomingMessage,
   response: ServerResponse,
-  service: FinancialSupportService,
+  service: HealthcareIntakeService,
   speechProvider: SpeechProvider | undefined,
 ): Promise<void> {
   response.setHeader("Access-Control-Allow-Origin", "*");
@@ -92,7 +107,7 @@ export interface ApiDispatchResult {
 
 /** Application-level router, exported so route behavior is testable without a socket. */
 export async function dispatchApiRequest(
-  service: FinancialSupportService,
+  service: HealthcareIntakeService,
   method: string,
   path: string,
   body: Readonly<Record<string, unknown>> = {},
@@ -107,17 +122,18 @@ export async function dispatchApiRequest(
         codename: "Project Bridge",
         status: "prototype",
         implemented: [
-          "deterministic failed-transfer interpretation",
+          "deterministic healthcare-intake interpretation",
+          "conservative emergency-language escalation",
           "clarification and explicit confirmation",
-          "simulated in-memory support cases",
+          "simulated in-memory clinic intakes",
           "request-scoped Intron/Sahara voice transcription",
         ],
         notImplemented: [
           "text-to-speech",
-          "real financial-service integrations",
+          "diagnosis, treatment, or prescription guidance",
+          "real clinic, appointment, or medical-record integrations",
           "authentication",
           "durable persistence",
-          "benchmark execution",
         ],
       },
     };
@@ -129,7 +145,7 @@ export async function dispatchApiRequest(
   const utteranceMatch = path.match(/^\/conversations\/([^/]+)\/utterances$/u);
   if (method === "POST" && utteranceMatch?.[1]) {
     if (typeof body.text !== "string") {
-      throw new FinancialSupportError(
+      throw new HealthcareIntakeError(
         "invalid-request",
         "A string 'text' field is required.",
         400,
@@ -152,7 +168,7 @@ export async function dispatchApiRequest(
       typeof body.proposalId !== "string" ||
       typeof body.conversationRevision !== "number"
     ) {
-      throw new FinancialSupportError(
+      throw new HealthcareIntakeError(
         "invalid-request",
         "proposalId and numeric conversationRevision are required.",
         400,
@@ -168,11 +184,11 @@ export async function dispatchApiRequest(
     };
   }
 
-  const caseMatch = path.match(/^\/support-cases\/([^/]+)$/u);
-  if (method === "GET" && caseMatch?.[1]) {
+  const intakeMatch = path.match(/^\/clinic-intakes\/([^/]+)$/u);
+  if (method === "GET" && intakeMatch?.[1]) {
     return {
       status: 200,
-      body: await service.getCase(decodeURIComponent(caseMatch[1])),
+      body: await service.getIntake(decodeURIComponent(intakeMatch[1])),
     };
   }
   return {
@@ -189,6 +205,12 @@ export function apiErrorResponse(error: unknown): ApiDispatchResult {
     };
   }
   if (error instanceof FinancialSupportError) {
+    return {
+      status: error.status,
+      body: { error: { code: error.code, message: error.message } },
+    };
+  }
+  if (error instanceof HealthcareIntakeError) {
     return {
       status: error.status,
       body: { error: { code: error.code, message: error.message } },
@@ -261,7 +283,7 @@ async function readJson(
   for await (const chunk of request) {
     raw += String(chunk);
     if (raw.length > 16_384) {
-      throw new FinancialSupportError(
+      throw new HealthcareIntakeError(
         "request-too-large",
         "Request body is too large.",
         413,
@@ -275,7 +297,7 @@ async function readJson(
     }
     return parsed as Record<string, unknown>;
   } catch {
-    throw new FinancialSupportError(
+    throw new HealthcareIntakeError(
       "invalid-json",
       "Request body must be a JSON object.",
       400,

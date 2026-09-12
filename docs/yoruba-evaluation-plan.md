@@ -2,13 +2,13 @@
 
 ## Status and scope
 
-**Decision:** the first versioned ground-truth fixture layer is Yoruba-first and limited to the simulated failed/pending-transfer support flow. It contains 36 synthetic, text-only scenarios. It is not collected speech, a model benchmark, evidence of model behavior, or a claim of comprehensive Yoruba support.
+**Decision:** the active challenge fixture layer is Yoruba-first and limited to simulated healthcare intake. It contains 16 synthetic, text-only scenarios, four each across Yoruba-heavy, Yoruba-English, Yoruba-Pidgin, and Nigerian English. The earlier 36 failed-transfer fixtures remain preserved as prior-domain work. Neither corpus is collected speech, a model benchmark, clinical validation, evidence of model behavior, or a claim of comprehensive language support.
 
-**Decision:** the official `intronhealth/AfriSwitch` Yoruba `test` split is the primary external ASR benchmark source. Project Bridge v0.1 freezes the first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; its Hugging Face revision will be resolved and frozen during the first materialization run. Its approximately 5 hours/1,877 general conversational Yoruba-English utterances remain a separate source from the 36 Project Bridge synthetic/domain fixtures and from `real-yo-001`. AfriSwitch supplies ASR references and mixing metadata, not automatic failed-transfer ground truth.
+**Decision:** the official `intronhealth/AfriSwitch` Yoruba `test` split remains the primary external ASR benchmark source. Project Bridge v0.1 freezes the first challenge slice at 75 samples with seed `project-bridge-challenge-v1`; its Hugging Face revision will be resolved and frozen during the first materialization run. Its general conversational Yoruba-English utterances remain separate from Project Bridge synthetic/domain fixtures and `real-yo-001`. AfriSwitch supplies ASR references and mixing metadata, not automatic healthcare-intake ground truth.
 
 **Decision:** the public `Kimyayd/vocal-money-codeswitch-asr-benchmark` `default/train` split is a secondary development source only. The v0.1 development slice uses 30 samples, seed `project-bridge-vocal-money-dev-v1`, and equal targets across Project Bridge's independently derived numeric-CMI selection buckets. Published `cmi_band` labels are retained separately and verbatim. Its completed local Sahara/OpenAI/Deepgram run is development evidence only: three uncertain clips are held out, leaving 27 scored samples per provider (one manually usable and 26 diagnostics-passed/unreviewed). It cannot replace, enlarge, or be silently combined with the primary AfriSwitch test slice, and it does not support a final challenge ranking. Source-published provider hypotheses remain excluded.
 
-The fixtures live in `evaluation/fixtures/yoruba-failed-transfer.v0.1.mts`. They are evenly divided across four declared language-mix slices: Yoruba-heavy, Yoruba-English code-switching, Yoruba-Pidgin code-switching, and Nigerian English. Within each slice, the corpus covers complete requests, missing required information, unsupported requests, and credential-like input that must be rejected without retaining a credential value.
+The active fixtures live in `evaluation/fixtures/yoruba-healthcare-intake.v0.1.mts`. They cover complete intake requests, duration/request clarification, explicit emergency language, unsupported clinical-advice requests, ambiguity, and unnecessary sensitive identifiers. The preserved `yoruba-failed-transfer.v0.1.mts` corpus is not silently relabeled as healthcare data.
 
 Yoruba is the initial focus because the project needs one concrete language context in which to test code-switching, orthographic variation, clarification, and safety labels. This is a project sequencing decision, not an empirical conclusion that one language, dialect, or provider is more important or performs better.
 
@@ -19,16 +19,16 @@ Every fixture records:
 - stable sample and scenario IDs;
 - the declared language profile and mix;
 - the synthetic user utterance, canonical reference transcript, and versioned normalized references;
-- expected intent and structured entities, including amount/currency, time, recipient/destination, and issue where supplied;
-- required fields present and missing;
+- expected `clinic_intake_request` intent and user-reported symptom, duration, requested-service, and urgency fields where supplied;
+- missing/optional intake concepts;
 - the expected clarification concept and representative question;
 - action eligibility and whether explicit confirmation is required;
 - expected final task result and safety outcome;
 - annotation notes and searchable tags.
 
-The annotations separate four questions: what was transcribed, whether the intent was understood, whether entities/slots were extracted, and whether the downstream task reached the expected safe outcome. A sample cannot be marked complete with a missing required field. An action is eligible only for a safe, complete failed-transfer request and still requires explicit user confirmation. Unsupported and credential-bearing requests are never action-eligible.
+The annotations separate transcription, intent, reported-concern preservation, symptom-phrase recall, duration, urgency-signal preservation, clarification, unsafe clinical inference, and downstream task completion. A task succeeds only for a sufficient non-emergency request after explicit confirmation. Emergency, unsupported, and sensitive-input cases cannot count as completed intake actions.
 
-All people, amounts, utterances, and situations are synthetic. Credential-bearing fixtures use the literal `REDACTED`; they contain no PIN, OTP, CVV, password, full card number, or full account number. The fixture validator rejects obvious credential values and credential-shaped expected entities.
+All people, utterances, and situations are synthetic. Sensitive fixtures use the literal `REDACTED`; they contain no real national ID, insurance number, medical-record number, credential, or patient identifier. Fixture validation rejects embedded identifier values and unsafe outcome combinations.
 
 ## Normalization profiles
 
@@ -40,7 +40,7 @@ These choices reflect that standard Yoruba orthography is tone-marked and that m
 
 ## Future audio collection
 
-No audio has been collected or committed. Before recording, the product and research teams must approve recruitment, compensation, consent language, allowed downstream-provider processing, licensing, withdrawal, storage access, and retention/deletion rules. Consent evidence and identity mappings must remain outside the versioned public manifest.
+No healthcare-specific participant audio has been collected or committed. Before recording, the product and research teams must approve clinical safety oversight, recruitment, compensation, consent language, allowed downstream-provider processing, licensing, withdrawal, storage access, and retention/deletion rules. Consent evidence and identity mappings must remain outside the versioned public manifest.
 
 A future collection should deliberately sample speakers and conditions rather than treating one recording style as representative. Subject to ethical recruitment and participant self-description, the plan should include multiple speakers, age groups, genders, regions, and language-mix preferences. Conditions should include quiet rooms, phone microphones, background conversation, television or radio, and street noise. Demographics, accent, or proficiency must not be inferred from voice.
 
@@ -54,18 +54,22 @@ The preparation record `evaluation/manifests/real-yo-001-comparison.v0.1.mts` re
 
 The batch runner is ready for local/mock manifests and fake-provider tests. It verifies checksums and checkpoints raw provider/sample outcomes, but it has not executed AfriSwitch or produced comparative evidence. Sahara/OpenAI/Deepgram batch execution begins only after the official 75-sample materialization succeeds and its governance gates are approved.
 
-## Future metric mapping
+## Downstream metric mapping
 
 - Transcription scoring will compare each provider hypothesis with the canonical reference, retaining raw WER and separately applying the frozen normalization profile for normalized WER.
-- Intent scoring will compare the predicted intent with `expectedIntent`; it will not be inferred from WER.
-- Entity/slot scoring will compare predicted structured values with `expectedEntities` under a separately versioned matching policy.
-- Clarification scoring will compare the observed missing-field request with `requiredFieldsMissing` and the expected clarification concept.
-- Downstream success will require the declared final result, including explicit confirmation for an eligible support-case action. Transcription, intent, entity, clarification, and task results remain distinct records.
+- `intakeIntentCorrect` compares the interpreted intent with the reviewed fixture intent; it is not inferred from WER.
+- `reportedConcernPreserved`, `symptomPhraseRecall`, and `durationPreserved` score preservation of user-stated meaning without diagnosis or unsupported transformation.
+- `urgencySignalPreserved` checks only the reviewed deterministic emergency signal; it is not a comprehensive triage score.
+- `clarificationAppropriate` checks whether the expected clarification concept was requested.
+- `unsafeClinicalInference` identifies added diagnoses, causes, treatment, prescriptions, or other unsupported clinical claims.
+- `taskCompleted` requires a safe, sufficient, explicitly confirmed simulated clinic intake. Transcription and every downstream measure remain distinct records.
 - Provider latency will be recorded only when real provider calls exist and will not be fabricated for these text fixtures.
 
 For the external AfriSwitch slice, preserve the official raw and tagged transcripts, then compute strict normalized WER/CER and the optional diacritic-insensitive sensitivity view separately with the versioned metric implementation. Intent/entity/task evaluation is absent unless a particular utterance later receives justified, reviewed domain annotation; it must never be inferred from the dataset's ASR labels.
 
-The same transcription-only separation applies to Vocal Money. Preserve its exact raw/tagged references and code-switch metadata, but do not derive failed-transfer intent, entity, action, or downstream-success labels from its financial-domain label or wording.
+The same transcription-only separation applies to Vocal Money. Preserve its exact raw/tagged references and code-switch metadata, but do not derive healthcare intent, symptom, urgency, action, or downstream-success labels from its source domain label or wording.
+
+AfriSwitchCare may later be considered as a separately governed healthcare-speech robustness source. It must remain distinct from the primary AfriSwitch ASR slice, and its clinical-conversation context must not be treated as Project Bridge intake/task ground truth without reviewed annotation, provenance, consent, licensing, provider-processing, and retention approval.
 
 ## Known limitations and review gates
 

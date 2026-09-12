@@ -64,6 +64,13 @@ export type Interpretation =
   | {
       readonly kind: "unsupported";
       readonly reason: string;
+    }
+  | {
+      readonly kind: "safety-escalation";
+      readonly category: string;
+      readonly reason: string;
+      readonly entities: readonly EntityValue[];
+      readonly intent?: IntentCandidate;
     };
 
 export interface ConversationInterpreter {

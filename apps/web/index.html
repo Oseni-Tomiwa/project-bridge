@@ -5,28 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Project Bridge simulated failed-transfer support prototype."
+      content="Project Bridge simulated voice-first clinic intake prototype."
     />
-    <title>Project Bridge — Transfer support prototype</title>
+    <title>Project Bridge — Clinic intake prototype</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to conversation</a>
     <main id="main-content">
       <header>
         <p class="eyebrow">Temporary codename · Challenge prototype</p>
-        <h1>Transfer support, in your own words.</h1>
+        <h1>Tell a clinic your concern, in your own words.</h1>
         <p class="lede">
-          Speak naturally in English, Nigerian Pidgin, or English/Yoruba
+          Speak naturally in Yoruba, Nigerian English, Pidgin, or Yoruba-English
           code-switching. You will see and can correct the transcript before it
           enters the support conversation.
         </p>
       </header>
 
       <aside class="notice" aria-label="Important safety notice">
-        <strong>This is a simulation.</strong> It creates a support request
-        only. It cannot move money, access an account, or contact a real bank.
-        Never share a PIN, OTP, password, CVV, full card number, or full account
-        number.
+        <strong>This is a simulation, not medical advice.</strong> It can create
+        a simulated clinic intake request only. It cannot diagnose, recommend
+        treatment, book an appointment, or contact a real clinic. If you report
+        explicit emergency warning language, it will advise immediate local
+        emergency or urgent medical help. Do not share national IDs, insurance
+        numbers, medical-record numbers, or payment credentials.
       </aside>
 
       <section class="conversation" aria-labelledby="conversation-heading">
@@ -38,16 +40,17 @@
             class="voice-panel"
             aria-labelledby="voice-heading"
           >
-            <h3 id="voice-heading">Tell us what happened</h3>
+            <h3 id="voice-heading">Tell us your health concern</h3>
             <p class="voice-warning">
-              Before recording, make sure you do not speak a PIN, OTP, password,
-              CVV, full card number, or full account number.
+              Health information is sensitive. Before recording, remove names,
+              national IDs, insurance numbers, medical-record numbers, and
+              payment credentials.
             </p>
             <button
               id="record"
               class="record-button"
               type="button"
-              aria-label="Start recording your transfer issue"
+              aria-label="Start recording your clinic intake request"
             >
               <svg
                 aria-hidden="true"
@@ -109,17 +112,18 @@
           <details id="text-fallback" class="text-fallback">
             <summary>Prefer to type instead?</summary>
             <form id="utterance-form">
-              <label for="utterance">What happened with your transfer?</label>
+              <label for="utterance">What should the clinic know?</label>
               <textarea
                 id="utterance"
                 name="utterance"
                 rows="4"
-                placeholder="Example: I sent 25k yesterday, owo ti kuro but the person never receive am."
+                placeholder="Example: Mo ti ni headache lati ana and my body dey hot. I want see doctor."
                 aria-describedby="utterance-help"
                 required
               ></textarea>
               <p id="utterance-help" class="small">
-                Do not include account or authentication details.
+                Do not include identifying, insurance, medical-record, or
+                payment details.
               </p>
               <button id="send" type="submit">Send typed message</button>
             </form>
@@ -127,8 +131,12 @@
         </div>
         <div id="confirmation" class="confirmation" hidden>
           <p id="proposal-summary"></p>
-          <button id="confirm" type="button">Yes, create support case</button>
-          <p class="small">Nothing is sent to a bank.</p>
+          <button id="confirm" type="button">
+            Yes, create simulated clinic intake
+          </button>
+          <p class="small">
+            No clinic is contacted and no appointment is booked.
+          </p>
         </div>
         <p id="status" class="status" role="status"></p>
       </section>

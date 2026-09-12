@@ -5,8 +5,9 @@ import { yorubaNormalizationProfiles } from "../profiles/yoruba-normalization.v0
 export const yorubaFirstEvaluationManifest = {
   id: YORUBA_LANGUAGE_PROFILE,
   version: "0.1",
-  status: "text-ground-truth-only",
-  domain: "financial-support",
+  status: "preserved-prior-domain-text-ground-truth-only",
+  domain: "financial-support-prior",
+  activeChallengeManifestId: "yoruba-healthcare-intake-v0.1",
   intent: "failed_transfer",
   fixtureIds: yorubaFailedTransferFixtures.map((fixture) => fixture.sampleId),
   normalizationProfileIds: [

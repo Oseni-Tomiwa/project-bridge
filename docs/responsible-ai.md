@@ -27,7 +27,7 @@ Do not recruit or record minors or vulnerable participants until appropriate saf
 - Encrypt data in transit and at rest once storage exists; apply least-privilege access and access logging.
 - Define retention and deletion before collection, including backups and provider-side retention.
 - Review provider terms for training use, subprocessors, regions, and deletion controls before sending participant data.
-- Redact or avoid collecting credentials, account numbers, health details, and other unnecessary sensitive content.
+- Redact or avoid collecting credentials, identifiers, and health details that are unnecessary for the stated intake purpose. Treat even relevant health text as sensitive.
 
 ## Safety controls
 
@@ -35,13 +35,17 @@ Classify each proposed action by consequence. Require explicit, specific confirm
 
 When confidence is insufficient, ask a neutral clarification or decline safely. Never turn model confidence into a claim of certainty. Distinguish “request accepted,” “action completed,” and “action failed.”
 
-High-risk verticals need domain-specific review, escalation paths, and regulatory analysis before real-world use. A challenge demo should use sandboxed or simulated downstream systems unless real execution has been explicitly approved and made safe.
+High-risk verticals need domain-specific review, escalation paths, and regulatory analysis before real-world use. This challenge demo uses only a simulated downstream intake and is not suitable for clinical decisions or emergency reliance.
 
-The current financial-support slice only creates a process-local simulated case after explicit confirmation. It does not authenticate users, inspect accounts, contact a bank, or move money. Microphone permission is requested only after the user activates recording. The UI warns against speaking credentials before recording, exposes the raw transcript for review, and requires Continue before the transcript becomes an utterance. Text remains available if voice is unsupported or permission is denied.
+The active healthcare slice only creates a process-local simulated clinic intake after explicit confirmation. It does not diagnose, triage comprehensively, recommend treatment, prescribe, access a medical record, contact a clinic, book an appointment, or replace professional care. The prior financial-support code remains present but is not the active API workflow.
+
+The deterministic emergency boundary is intentionally narrow. It reacts to explicit inability to breathe, unconscious/not-waking language, severe uncontrolled bleeding, active seizure, or explicit immediate life-threatening wording by blocking routine intake and advising immediate local emergency or urgent assistance. It must not be represented as comprehensive medical triage; clinical owners must review its phrases, false-negative risk, accessibility, jurisdiction-specific destinations, and emergency numbers before real use.
+
+Microphone permission is requested only after the user activates recording. The UI warns that health information is sensitive, exposes the raw transcript for review, and requires Continue before the transcript becomes an utterance. Text remains available if voice is unsupported or permission is denied.
 
 Project Bridge holds product-flow audio only in browser memory and API/provider request scope; v0.1 does not persist it. Intron receives the audio for transcription, so this is not a claim that no third party processes or retains it. Provider terms, account settings, notice, lawful basis, and retention/deletion behavior require review before real-user use.
 
-The API rejects obvious credential and long card/account-number patterns before adding the user-approved transcript or typed text to conversation state. This server-side check remains authoritative, but it occurs after voice transcription and therefore cannot prevent a spoken credential from reaching the speech provider. The pattern check is defense in depth for a demo, not reliable data-loss prevention. Logs, reverse proxies, browsers, and future integrations require their own controls before real user data is accepted.
+The API rejects obvious national-ID, insurance-number, medical-record-number, credential, and long card/account-number patterns before adding the user-approved transcript or typed text to conversation state. This server-side check remains authoritative, but it occurs after voice transcription and therefore cannot prevent spoken health data or identifiers from reaching the speech provider. The pattern check is defense in depth for a demo, not reliable data-loss prevention. Logs, reverse proxies, browsers, and future integrations require their own controls before real user data is accepted.
 
 ## Fairness and evaluation
 

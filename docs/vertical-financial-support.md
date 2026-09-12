@@ -1,5 +1,7 @@
 # Financial-support vertical slice
 
+> **Status:** preserved prior-domain implementation. Healthcare intake is the active challenge MVP as of 2026-09-12. This code and its regression tests remain for architectural continuity; the active API no longer routes conversations here.
+
 ## Target user and problem
 
 The prototype is for a person who needs help reporting a failed or pending transfer and may find a form or conventional support navigation difficult. English, Nigerian Pidgin, and simple English/Yoruba code-switching are representative interaction styles, not claims of comprehensive language support.

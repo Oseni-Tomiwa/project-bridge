@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  FinancialSupportService,
-  InMemorySupportCaseRepository,
+  HealthcareIntakeService,
+  InMemoryClinicIntakeRepository,
 } from "@project-bridge/domain";
 import type {
   AudioInput,
@@ -15,8 +15,7 @@ import {
   transcribeProductAudio,
 } from "../src/speech-transcription.js";
 
-const voiceFixture =
-  "I sent 25k yesterday, owo ti kuro but the person never receive am";
+const voiceFixture = "I have headache and I want to see a doctor";
 
 function fakeProvider(
   outcome: TranscriptionOutcome = successOutcome(voiceFixture),
@@ -175,11 +174,11 @@ describe("product speech transcription boundary", () => {
     },
   );
 
-  it("feeds the editable transcript into the existing clarification and confirmation flow", async () => {
+  it("feeds the editable transcript into the active healthcare clarification and confirmation flow", async () => {
     const transcript = await transcribeProductAudio(fakeProvider(), upload());
     let sequence = 0;
-    const service = new FinancialSupportService({
-      cases: new InMemorySupportCaseRepository(),
+    const service = new HealthcareIntakeService({
+      intakes: new InMemoryClinicIntakeRepository(),
       now: () => new Date("2026-09-09T00:00:00.000Z"),
       createId: (kind) => `${kind}-${++sequence}`,
     });
@@ -191,12 +190,13 @@ describe("product speech transcription boundary", () => {
     );
     expect(clarification).toMatchObject({
       state: "awaiting-input",
-      assistantMessage: "Who was the transfer sent to?",
+      assistantMessage:
+        "How long have you had these symptoms? You can say you are not sure.",
     });
 
     const confirmation = await service.submitUtterance(
       started.conversationId,
-      "my brother",
+      "since yesterday",
     );
     expect(confirmation.state).toBe("awaiting-confirmation");
   });
