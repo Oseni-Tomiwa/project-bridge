@@ -5,14 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Project Bridge simulated voice-first clinic intake prototype."
+      content="Project Bridge — Voice-first AI access layer for code-switched healthcare intake."
     />
-    <title>Project Bridge — Clinic intake prototype</title>
+    <title>Project Bridge — Voice-First Clinic Intake</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to conversation</a>
+
+    <!-- Top Navigation & Hackathon Showcase Bar -->
+    <header class="app-nav" role="banner">
+      <div class="nav-container">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+              <line x1="8" y1="22" x2="16" y2="22"></line>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">Project Bridge</span>
+            <span class="brand-tagline">Voice-First Code-Switch Layer</span>
+          </div>
+        </div>
+
+        <div class="nav-badges" aria-label="Project and engine status">
+          <span class="badge badge-accent">Sahara CodeSwitch Africa</span>
+          <span class="badge badge-engine" title="Primary production ASR route">Intron / Sahara ASR (yo)</span>
+          <span class="badge badge-safety">Safe Clinical Triage</span>
+        </div>
+
+        <div class="nav-actions">
+          <button id="btn-show-samples" class="nav-btn" type="button" aria-expanded="false" aria-controls="demo-tray">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <path d="M11.3 1.046A1 1 0 0 1 12 2v5h4a1 1 0 0 1 .82 1.573l-7 10A1 1 0 0 1 8 18v-5H4a1 1 0 0 1-.82-1.573l7-10a1 1 0 0 1 1.12-.38z" />
+            </svg>
+            <span>Demo Phrases</span>
+          </button>
+          <button id="btn-show-benchmark" class="nav-btn" type="button">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3zm2 3a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1zm1 3a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2H6z" clip-rule="evenodd" />
+            </svg>
+            <span>Benchmark Specs</span>
+          </button>
+          <button id="btn-reset-session" class="nav-btn nav-btn-ghost" type="button" title="Start fresh session">
+            <svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 0 1 1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 0 14.001 13H11a1 1 0 1 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z" clip-rule="evenodd" />
+            </svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
     <main id="main-content">
-      <header>
+      <!-- Hero Presentation Section -->
+      <section class="hero-section">
         <p class="eyebrow">
           <span class="status-pill">Simulation</span>
           Voice-first clinic intake
@@ -23,24 +72,126 @@
           code-switching. You will see and can correct the transcript before it
           enters the support conversation.
         </p>
-      </header>
+      </section>
 
+      <!-- Safety Notice -->
       <aside class="notice" aria-label="Important safety notice">
-        <strong>This is a simulation, not medical advice.</strong> It can create
-        a simulated clinic intake request only. It cannot diagnose, recommend
-        treatment, book an appointment, or contact a real clinic. If you report
-        explicit emergency warning language, it will advise immediate local
-        emergency or urgent medical help. Do not share national IDs, insurance
-        numbers, medical-record numbers, or payment credentials.
+        <div class="notice-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="20" height="20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 0 1 2.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0 1 10 1.944zM11 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm0-7a1 1 0 1 0-2 0v3a1 1 0 1 0 2 0V7z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="notice-content">
+          <strong>This is a simulation, not medical advice.</strong> It can create
+          a simulated clinic intake request only. It cannot diagnose, recommend
+          treatment, book an appointment, or contact a real clinic. If you report
+          explicit emergency warning language, it will advise immediate local
+          emergency or urgent medical help. Do not share national IDs, insurance
+          numbers, medical-record numbers, or payment credentials.
+        </div>
       </aside>
 
+      <!-- Judge-Friendly Quick Demo Trays -->
+      <section id="demo-tray" class="demo-tray" aria-label="Quick test code-switching demo phrases">
+        <div class="demo-tray-header">
+          <span class="demo-tray-title">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <path d="M11.3 1.046A1 1 0 0 1 12 2v5h4a1 1 0 0 1 .82 1.573l-7 10A1 1 0 0 1 8 18v-5H4a1 1 0 0 1-.82-1.573l7-10a1 1 0 0 1 1.12-.38z" />
+            </svg>
+            <strong>Quick Demo Phrases</strong> (One-click evaluation for judges)
+          </span>
+          <span class="demo-tray-subtext">Click any phrase to auto-fill the message</span>
+        </div>
+        <div class="demo-chips">
+          <button type="button" class="demo-chip" data-phrase="Mo ti ni headache lati ana and my body dey hot. I want see doctor.">
+            <span class="chip-label chip-primary">Challenge Flow</span>
+            <span class="chip-text">“Mo ti ni headache lati ana and my body dey hot. I want see doctor.”</span>
+          </button>
+          <button type="button" class="demo-chip" data-phrase="Mi ò lè mí, mo nilo iranwọ pajawiri bayi.">
+            <span class="chip-label chip-emergency">Emergency Boundary</span>
+            <span class="chip-text">“Mi ò lè mí, mo nilo iranwọ pajawiri bayi.”</span>
+          </button>
+          <button type="button" class="demo-chip" data-phrase="My eye dey pain me since two days, I need see doctor.">
+            <span class="chip-label chip-pidgin">Nigerian Pidgin</span>
+            <span class="chip-text">“My eye dey pain me since two days, I need see doctor.”</span>
+          </button>
+          <button type="button" class="demo-chip" data-phrase="Mo fẹ́ rí dọ́kítà, inú ń run mi gan-an láti àárọ̀.">
+            <span class="chip-label chip-yoruba">Yoruba Heavy</span>
+            <span class="chip-text">“Mo fẹ́ rí dọ́kítà, inú ń run mi gan-an láti àárọ̀.”</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Emergency Escalation High-Visibility Card -->
+      <aside id="emergency-card" class="emergency-card" hidden role="alert" aria-live="assertive">
+        <div class="emergency-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="emergency-body">
+          <h3>Immediate Emergency Assistance Advised</h3>
+          <p class="emergency-lead">
+            Your message contains explicit emergency language. Routine clinic intake has been <strong>safely halted</strong>.
+          </p>
+          <div class="emergency-steps">
+            <div class="emergency-step">
+              <strong>Emergency Services:</strong> Dial <strong>112</strong> or <strong>199</strong> (Nigeria) immediately.
+            </div>
+            <div class="emergency-step">
+              <strong>Urgent Care:</strong> Proceed to the nearest hospital emergency department without delay.
+            </div>
+          </div>
+          <p class="emergency-footnote">
+            Bridge prioritizes patient safety: routine simulated intake is never created when life-threatening symptoms are detected.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Digital Clinic Intake Pass (Created State) -->
+      <article id="intake-pass" class="intake-pass" hidden>
+        <div class="pass-header">
+          <div class="pass-badge">
+            <span class="pass-dot" aria-hidden="true"></span>
+            Simulated Clinic Intake Logged
+          </div>
+          <time id="pass-timestamp" class="pass-time">Today</time>
+        </div>
+        <div class="pass-body">
+          <p class="pass-label">Official Intake Reference ID</p>
+          <div class="pass-reference-row">
+            <code id="pass-reference-code" class="pass-code">BRG-H-2026-XXXXX</code>
+            <button id="btn-copy-ref" class="btn-copy" type="button" aria-label="Copy reference ID">
+              <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor">
+                <path d="M8 3a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1z" />
+                <path d="M6 3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2 3 3 0 0 1-3 2H9a3 3 0 0 1-3-2z" />
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <div id="pass-details" class="pass-details"></div>
+          <div class="pass-footer">
+            <p class="small">
+              Give this reference to the clinic receptionist or nurse when you arrive.
+            </p>
+            <button id="btn-new-intake" class="secondary-button" type="button">Start another intake</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Main Conversation & Interaction Window -->
       <section class="conversation" aria-labelledby="conversation-heading">
         <div class="conversation-heading">
           <h2 id="conversation-heading">Your intake conversation</h2>
           <p id="flow-state" class="flow-state">Starting…</p>
         </div>
+
         <ol id="history" class="history" aria-live="polite"></ol>
+
         <div id="interaction">
+          <!-- Voice Panel -->
           <section
             id="voice-panel"
             class="voice-panel"
@@ -53,24 +204,29 @@
               name, national ID, insurance number, medical-record number, phone
               number, address, or payment credentials.
             </p>
+
             <button
               id="record"
               class="record-button"
               type="button"
               aria-label="Start recording your clinic intake request"
             >
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                width="32"
-                height="32"
-              >
-                <path
-                  d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm-7-3a1 1 0 0 1 2 0 5 5 0 0 0 10 0 1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V20h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 5 11Z"
-                />
-              </svg>
-              <span>Start recording</span>
+              <div class="record-pulse-ring" aria-hidden="true"></div>
+              <div class="record-icon-wrapper">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  width="36"
+                  height="36"
+                >
+                  <path
+                    d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm-7-3a1 1 0 0 1 2 0 5 5 0 0 0 10 0 1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V20h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 5 11Z"
+                  />
+                </svg>
+              </div>
+              <span class="record-button-text">Start recording</span>
             </button>
+
             <p
               id="voice-state"
               class="voice-state"
@@ -79,11 +235,27 @@
             >
               Microphone access is requested only when you start recording.
             </p>
+
             <div id="recording-controls" class="recording-controls" hidden>
-              <p class="recording-indicator">
+              <div class="recording-indicator">
                 <span class="recording-dot" aria-hidden="true"></span>
-                Recording <time id="recording-time">0:00</time>
-              </p>
+                <span>Recording <time id="recording-time">0:00</time> / 1:00</span>
+              </div>
+
+              <!-- Animated Sound Waveform -->
+              <div class="audio-waveform" aria-hidden="true">
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+              </div>
+
               <div class="button-row">
                 <button id="stop-recording" type="button">
                   Stop recording
@@ -99,19 +271,34 @@
             </div>
           </section>
 
+          <!-- Transcript Review Panel -->
           <form id="transcript-form" class="transcript-panel" hidden>
-            <h3>Review the transcript</h3>
+            <div class="panel-header-row">
+              <h3>Review the transcript</h3>
+              <div id="transcript-meta" class="transcript-meta">
+                <span class="meta-tag meta-engine">Sahara ASR (yo)</span>
+                <span id="transcript-latency" class="meta-tag meta-time">~2.1s</span>
+                <span class="meta-tag meta-lang">Code-Switching</span>
+              </div>
+            </div>
             <p class="transcript-help">
               Check every word before it enters your intake conversation.
             </p>
-            <p class="transcript-label">Original transcription</p>
-            <blockquote id="raw-transcript"></blockquote>
-            <label for="transcript">Edit the transcript if needed</label>
-            <textarea id="transcript" rows="4" required></textarea>
-            <p class="small">
-              Your edited text—not the original recording—continues into the
-              support flow.
-            </p>
+
+            <div class="transcript-card">
+              <p class="transcript-label">Original transcription</p>
+              <blockquote id="raw-transcript"></blockquote>
+            </div>
+
+            <div class="transcript-edit-group">
+              <label for="transcript">Edit the transcript if needed</label>
+              <textarea id="transcript" rows="4" required></textarea>
+              <p class="small">
+                Your edited text—not the original recording—continues into the
+                support flow.
+              </p>
+            </div>
+
             <div class="button-row">
               <button id="continue-transcript" type="submit">
                 Use this transcript
@@ -122,6 +309,7 @@
             </div>
           </form>
 
+          <!-- Text Entry Fallback -->
           <details id="text-fallback" class="text-fallback">
             <summary>Prefer to type instead?</summary>
             <form id="utterance-form">
@@ -145,20 +333,109 @@
             </form>
           </details>
         </div>
+
+        <!-- Structured Clinical Confirmation Panel -->
         <div id="confirmation" class="confirmation" hidden>
-          <p class="panel-kicker">Ready for your confirmation</p>
-          <h3>Review your simulated intake</h3>
-          <p id="proposal-summary"></p>
-          <button id="confirm" type="button">
+          <div class="confirmation-header">
+            <span class="panel-kicker">Ready for your confirmation</span>
+            <h3>Review your simulated intake</h3>
+          </div>
+
+          <!-- Formatted Triage Summary Card -->
+          <div id="triage-card" class="triage-card"></div>
+
+          <p id="proposal-summary" class="proposal-summary-text"></p>
+
+          <button id="confirm" type="button" class="confirm-btn">
             Yes, create simulated clinic intake
           </button>
           <p class="small">
             No clinic is contacted and no appointment is booked.
           </p>
         </div>
+
         <p id="status" class="status" role="status"></p>
       </section>
     </main>
+
+    <!-- Benchmark & Technical Specs Modal -->
+    <dialog id="benchmark-modal" class="benchmark-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="status-pill">Evaluation Report</span>
+            <h3>ASR Benchmark & Architecture</h3>
+          </div>
+          <button id="btn-close-modal" class="modal-close-btn" type="button" aria-label="Close modal">✕</button>
+        </div>
+
+        <div class="modal-content">
+          <h4>3-Provider ASR Evaluation (Yoruba-English Code-Switching)</h4>
+          <p class="modal-lead">
+            Evaluated on 30 stratified code-switched speech clips from the <code>Vocal Money</code> benchmark dataset:
+          </p>
+
+          <div class="table-responsive">
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th>ASR Provider</th>
+                  <th>Model / Route</th>
+                  <th>Strict WER</th>
+                  <th>Strict CER</th>
+                  <th>Diacritic-Free WER</th>
+                  <th>Median Latency</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>Intron / Sahara</strong></td>
+                  <td>Sahara Engine (<code>yo</code>)</td>
+                  <td><strong>0.8864</strong></td>
+                  <td><strong>0.5622</strong></td>
+                  <td><strong>0.7074</strong></td>
+                  <td>2,577 ms</td>
+                </tr>
+                <tr>
+                  <td><strong>OpenAI</strong></td>
+                  <td><code>gpt-transcribe</code></td>
+                  <td>0.9105</td>
+                  <td>0.6199</td>
+                  <td>0.8153</td>
+                  <td>1,688 ms</td>
+                </tr>
+                <tr>
+                  <td><strong>Deepgram</strong></td>
+                  <td><code>nova-3</code> (multi, OOD)</td>
+                  <td>0.9645</td>
+                  <td>0.7690</td>
+                  <td>0.9645</td>
+                  <td>1,830 ms</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="modal-insights">
+            <div class="insight-item">
+              <strong>Sahara Performance:</strong> Sahara's specialized Yoruba-English code-switched route achieves the lowest character and word error rates across both strict orthography and diacritic-normalized modes.
+            </div>
+            <div class="insight-item">
+              <strong>Human-in-the-Loop Architecture:</strong> High baseline error rates across all ASR engines in code-switched environments mandate that raw speech is verified by the user before committing downstream clinic actions.
+            </div>
+            <div class="insight-item">
+              <strong>Safety Escalation:</strong> Narrow deterministic escalation boundary immediately halts routine intake upon detecting emergency language.
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <p class="small">Source: <code>submission/BENCHMARK_REPORT.md</code></p>
+          <button id="btn-close-modal-bottom" class="secondary-button" type="button">Close</button>
+        </div>
+      </div>
+    </dialog>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

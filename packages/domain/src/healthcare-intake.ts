@@ -158,12 +158,13 @@ export type HealthcareIntakeReply =
     };
 
 export class HealthcareIntakeError extends Error {
-  constructor(
-    readonly code: string,
-    message: string,
-    readonly status: number,
-  ) {
+  readonly code: string;
+  readonly status: number;
+
+  constructor(code: string, message: string, status: number) {
     super(message);
+    this.code = code;
+    this.status = status;
   }
 }
 
@@ -547,7 +548,10 @@ export class HealthcareIntakeService {
   readonly #interpreter = new DeterministicHealthcareIntakeInterpreter();
   readonly #action: ActionExecutor;
 
-  constructor(private readonly dependencies: HealthcareIntakeDependencies) {
+  private readonly dependencies: HealthcareIntakeDependencies;
+
+  constructor(dependencies: HealthcareIntakeDependencies) {
+    this.dependencies = dependencies;
     this.#action = createClinicIntakeExecutor(dependencies);
   }
 

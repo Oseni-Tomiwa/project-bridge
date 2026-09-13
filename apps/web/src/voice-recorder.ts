@@ -41,11 +41,11 @@ interface MediaRecorderConstructor {
 }
 
 export class VoiceTranscriptionError extends Error {
-  constructor(
-    readonly code: string,
-    message: string,
-  ) {
+  readonly code: string;
+
+  constructor(code: string, message: string) {
     super(message);
+    this.code = code;
   }
 }
 
@@ -81,7 +81,10 @@ export class VoiceRecorderController {
   readonly #setInterval: (handler: () => void, delay: number) => number;
   readonly #clearInterval: (id: number) => void;
 
-  constructor(private readonly dependencies: VoiceRecorderDependencies) {
+  private readonly dependencies: VoiceRecorderDependencies;
+
+  constructor(dependencies: VoiceRecorderDependencies) {
+    this.dependencies = dependencies;
     this.#now = dependencies.now ?? (() => performance.now());
     this.#setInterval =
       dependencies.setInterval ??

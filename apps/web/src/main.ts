@@ -38,6 +38,24 @@ const continueButton = requiredElement<HTMLButtonElement>(
 const recordAgainButton = requiredElement<HTMLButtonElement>("record-again");
 const utteranceLabel = requiredElement<HTMLLabelElement>("utterance-label");
 
+// Enhanced UI Elements
+const emergencyCard = document.getElementById("emergency-card") as HTMLElement | null;
+const intakePass = document.getElementById("intake-pass") as HTMLElement | null;
+const passReferenceCode = document.getElementById("pass-reference-code");
+const passDetails = document.getElementById("pass-details");
+const btnCopyRef = document.getElementById("btn-copy-ref");
+const btnNewIntake = document.getElementById("btn-new-intake");
+const btnShowSamples = document.getElementById("btn-show-samples");
+const btnShowBenchmark = document.getElementById("btn-show-benchmark");
+const btnResetSession = document.getElementById("btn-reset-session");
+const benchmarkModal = document.getElementById("benchmark-modal") as HTMLDialogElement | null;
+const btnCloseModal = document.getElementById("btn-close-modal");
+const btnCloseModalBottom = document.getElementById("btn-close-modal-bottom");
+const demoTray = document.getElementById("demo-tray");
+const triageCard = document.getElementById("triage-card");
+const transcriptLatency = document.getElementById("transcript-latency");
+const textFallback = document.getElementById("text-fallback") as HTMLDetailsElement | null;
+
 interface Proposal {
   id: string;
   conversationRevision: number;
@@ -80,6 +98,7 @@ let currentProposal: Proposal | undefined;
 let productState: ProductState = "idle";
 let interactionBusy = false;
 let voiceOperationBusy = false;
+let lastTranscription: VoiceTranscription | undefined;
 
 function requiredElement<ElementType extends HTMLElement>(
   id: string,
@@ -98,7 +117,7 @@ function addTurn(role: "You" | "Bridge", text: string, scroll = true): void {
   const item = document.createElement("li");
   item.className = role === "You" ? "turn user" : "turn assistant";
   const label = document.createElement("strong");
-  label.textContent = role;
+  label.textContent = role === "You" ? "You (Patient)" : "Bridge Clinical Assistant";
   const message = document.createElement("p");
   message.textContent = text;
   item.append(label, message);
@@ -182,11 +201,12 @@ async function transcribeAudio(
       "The transcription response was incomplete. Try again or type your message.",
     );
   }
-  return {
+  lastTranscription = {
     transcript: body.transcript,
     provider: body.provider,
     latencyMs: body.latencyMs,
   };
+  return lastTranscription;
 }
 
 const voice = new VoiceRecorderController({
@@ -222,6 +242,10 @@ function renderVoice(snapshot: VoiceRecorderSnapshot): void {
   textarea.disabled = interactionBusy || voiceOperationBusy;
   sendButton.disabled = interactionBusy || voiceOperationBusy;
 
+  if (transcriptLatency && lastTranscription) {
+    transcriptLatency.textContent = `~${(lastTranscription.latencyMs / 1000).toFixed(1)}s`;
+  }
+
   switch (snapshot.state) {
     case "idle":
       setProductState("idle");
@@ -240,7 +264,7 @@ function renderVoice(snapshot: VoiceRecorderSnapshot): void {
       break;
     case "processing":
       setProductState("processing/transcribing");
-      voiceState.textContent = "Transcribing your recording…";
+      voiceState.textContent = "Transcribing your recording with Sahara ASR…";
       break;
     case "transcription-ready":
       setProductState("transcription-ready");
@@ -258,16 +282,63 @@ function renderVoice(snapshot: VoiceRecorderSnapshot): void {
   }
 }
 
+function renderTriageCard(summary: string): void {
+  if (!triageCard) return;
+  triageCard.innerHTML = "";
+
+  const concernMatch = summary.match(/You reported:\s*([^.]+)/i);
+  const symptomsMatch = summary.match(/Symptoms you reported:\s*([^.]+)/i);
+  const durationMatch = summary.match(/Duration you reported:\s*([^.]+)/i);
+  const serviceMatch = summary.match(/Requested service:\s*([^.]+)/i);
+
+  const rows: Array<{ label: string; value: string }> = [];
+  if (concernMatch?.[1]) {
+    rows.push({ label: "Reported Concern", value: concernMatch[1].trim() });
+  }
+  if (symptomsMatch?.[1]) {
+    rows.push({ label: "Identified Symptoms", value: symptomsMatch[1].trim() });
+  }
+  if (durationMatch?.[1]) {
+    rows.push({ label: "Duration", value: durationMatch[1].trim() });
+  }
+  if (serviceMatch?.[1]) {
+    rows.push({ label: "Requested Service", value: serviceMatch[1].trim() });
+  }
+
+  if (rows.length === 0) {
+    rows.push({ label: "Intake Summary", value: summary });
+  }
+
+  for (const row of rows) {
+    const rowEl = document.createElement("div");
+    rowEl.className = "triage-row";
+    const labelEl = document.createElement("span");
+    labelEl.className = "triage-field-label";
+    labelEl.textContent = row.label;
+    const valEl = document.createElement("span");
+    valEl.className = "triage-field-val";
+    valEl.textContent = row.value;
+    rowEl.append(labelEl, valEl);
+    triageCard.append(rowEl);
+  }
+}
+
 function applyReply(reply: ApiReply): void {
   conversationId = reply.conversationId;
   addTurn("Bridge", reply.assistantMessage, reply.revision > 0);
   currentProposal = reply.proposal;
   confirmation.hidden = reply.state !== "awaiting-confirmation";
   interaction.hidden = reply.state !== "awaiting-input";
-  if (reply.proposal) proposalSummary.textContent = reply.proposal.summary;
+  if (reply.proposal) {
+    proposalSummary.textContent = reply.proposal.summary;
+    renderTriageCard(reply.proposal.summary);
+  }
 
   if (reply.state === "awaiting-input") {
     setProductState(reply.revision === 0 ? "idle" : "clarification");
+    if (emergencyCard) emergencyCard.hidden = true;
+    if (intakePass) intakePass.hidden = true;
+
     const askingForName =
       reply.missingFields?.includes("preferredName") === true;
     flowState.textContent = askingForName
@@ -293,17 +364,34 @@ function applyReply(reply: ApiReply): void {
   } else if (reply.state === "awaiting-confirmation") {
     setProductState("confirmation");
     flowState.textContent = "Confirmation required";
+    if (emergencyCard) emergencyCard.hidden = true;
+    if (intakePass) intakePass.hidden = true;
   } else if (reply.state === "emergency-escalation") {
     setProductState("emergency-escalation");
     flowState.textContent = "Emergency guidance";
     status.textContent = "No routine clinic intake was created.";
     status.className = "status error";
     status.setAttribute("role", "alert");
+    if (emergencyCard) {
+      emergencyCard.hidden = false;
+      emergencyCard.scrollIntoView({ behavior: "smooth" });
+    }
+    if (intakePass) intakePass.hidden = true;
   } else {
     setProductState("completed");
     flowState.textContent = "Simulated intake created";
-    status.textContent = `Simulated clinic intake reference: ${reply.intakeReference ?? "unavailable"}`;
+    const ref = reply.intakeReference ?? "unavailable";
+    status.textContent = `Simulated clinic intake reference: ${ref}`;
     status.className = "status success";
+    if (emergencyCard) emergencyCard.hidden = true;
+    if (intakePass) {
+      intakePass.hidden = false;
+      if (passReferenceCode) passReferenceCode.textContent = ref;
+      if (passDetails && currentProposal) {
+        passDetails.textContent = currentProposal.summary;
+      }
+      intakePass.scrollIntoView({ behavior: "smooth" });
+    }
   }
 }
 
@@ -430,4 +518,69 @@ function formatDuration(milliseconds: number): string {
   return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`;
 }
 
+function resetSession(): void {
+  history.innerHTML = "";
+  voice.reset();
+  textarea.value = "";
+  if (emergencyCard) emergencyCard.hidden = true;
+  if (intakePass) intakePass.hidden = true;
+  confirmation.hidden = true;
+  interaction.hidden = false;
+  clearStatus();
+  void start();
+}
+
+// Wire up Quick Demo & Navigation Actions
+btnShowSamples?.addEventListener("click", () => {
+  demoTray?.scrollIntoView({ behavior: "smooth" });
+});
+
+btnShowBenchmark?.addEventListener("click", () => {
+  benchmarkModal?.showModal();
+});
+
+btnCloseModal?.addEventListener("click", () => {
+  benchmarkModal?.close();
+});
+
+btnCloseModalBottom?.addEventListener("click", () => {
+  benchmarkModal?.close();
+});
+
+benchmarkModal?.addEventListener("click", (event) => {
+  if (event.target === benchmarkModal) benchmarkModal.close();
+});
+
+btnCopyRef?.addEventListener("click", async () => {
+  const code = passReferenceCode?.textContent?.trim();
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    const span = btnCopyRef.querySelector("span");
+    if (span) {
+      const original = span.textContent;
+      span.textContent = "Copied! ✓";
+      setTimeout(() => {
+        span.textContent = original;
+      }, 2000);
+    }
+  } catch {
+    // Clipboard permission or focus fallback
+  }
+});
+
+btnNewIntake?.addEventListener("click", resetSession);
+btnResetSession?.addEventListener("click", resetSession);
+
+document.querySelectorAll<HTMLButtonElement>(".demo-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    const phrase = chip.dataset.phrase;
+    if (!phrase) return;
+    if (textFallback) textFallback.open = true;
+    textarea.value = phrase;
+    void submitCanonicalUtterance(phrase);
+  });
+});
+
 void start();
+
